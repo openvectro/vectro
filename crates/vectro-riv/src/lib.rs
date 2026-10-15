@@ -45,6 +45,15 @@ impl FieldType {
             _ => Self::Uint,
         }
     }
+
+    fn toc_bits(self) -> u32 {
+        match self {
+            Self::String | Self::Bytes => 1,
+            Self::Double => 2,
+            Self::Color => 3,
+            Self::Uint | Self::Int | Self::Bool => 0,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -91,7 +100,8 @@ pub struct RivFile {
     pub major: u64,
     pub minor: u64,
     pub file_id: u64,
-    pub toc: HashMap<u64, FieldType>,
+    /// Properties newer than the baseline, in file order, with their backing type.
+    pub toc: Vec<(u64, FieldType)>,
     pub objects: Vec<Object>,
 }
 
@@ -147,6 +157,18 @@ impl Schema {
 
     pub fn type_name(&self, key: u64) -> Option<&str> {
         self.types.get(&key).map(String::as_str)
+    }
+
+    pub fn type_key(&self, name: &str) -> Option<u64> {
+        self.types.iter().find(|(_, n)| n.as_str() == name).map(|(k, _)| *k)
+    }
+
+    pub fn property_key(&self, name: &str) -> Option<u64> {
+        self.props.iter().find(|(_, (n, _))| n == name).map(|(k, _)| *k)
+    }
+
+    pub fn property_type(&self, key: u64) -> Option<FieldType> {
+        self.props.get(&key).and_then(|(_, t)| *t)
     }
 }
 
@@ -230,14 +252,14 @@ pub fn read(bytes: &[u8], schema: &Schema) -> Result<RivFile, Error> {
         }
         keys.push(k);
     }
-    let mut toc = HashMap::new();
+    let mut toc = Vec::with_capacity(keys.len());
     let (mut word, mut bit) = (0u32, 8);
     for k in keys {
         if bit == 8 {
             word = r.u32()?;
             bit = 0;
         }
-        toc.insert(k, FieldType::from_toc((word >> bit) & 3));
+        toc.push((k, FieldType::from_toc((word >> bit) & 3)));
         bit += 2;
     }
 
@@ -255,7 +277,7 @@ pub fn read(bytes: &[u8], schema: &Schema) -> Result<RivFile, Error> {
             // The schema knows bool/int/bytes apart; the ToC only knows the backing type.
             let ty = known
                 .and_then(|(_, t)| *t)
-                .or_else(|| toc.get(&key).copied())
+                .or_else(|| toc.iter().find(|(k, _)| *k == key).map(|(_, t)| *t))
                 .ok_or(Error::UnknownProperty { key, offset })?;
             let value = r.value(ty)?;
             properties.push(Property { key, name: known.map(|(n, _)| n.clone()), value });
@@ -264,4 +286,60 @@ pub fn read(bytes: &[u8], schema: &Schema) -> Result<RivFile, Error> {
     }
 
     Ok(RivFile { major, minor, file_id, toc, objects })
+}
+
+fn put_varuint(out: &mut Vec<u8>, mut v: u64) {
+    loop {
+        let b = (v & 0x7f) as u8;
+        v >>= 7;
+        if v == 0 {
+            out.push(b);
+            return;
+        }
+        out.push(b | 0x80);
+    }
+}
+
+fn put_value(out: &mut Vec<u8>, value: &Value) {
+    match value {
+        Value::Uint(v) => put_varuint(out, *v),
+        Value::Int(v) => put_varuint(out, ((v << 1) ^ (v >> 63)) as u64),
+        Value::Double(v) => out.extend_from_slice(&v.to_bits().to_le_bytes()),
+        Value::Color(v) => out.extend_from_slice(&v.to_le_bytes()),
+        Value::Bool(v) => out.push(u8::from(*v)),
+        Value::String(v) => {
+            put_varuint(out, v.len() as u64);
+            out.extend_from_slice(v.as_bytes());
+        }
+        Value::Bytes(v) => {
+            put_varuint(out, v.len() as u64);
+            out.extend_from_slice(v);
+        }
+    }
+}
+
+/// Serialise a file. Reading a file and writing it back gives the same bytes.
+pub fn write(file: &RivFile) -> Vec<u8> {
+    let mut out = b"RIVE".to_vec();
+    put_varuint(&mut out, file.major);
+    put_varuint(&mut out, file.minor);
+    put_varuint(&mut out, file.file_id);
+    for (k, _) in &file.toc {
+        put_varuint(&mut out, *k);
+    }
+    put_varuint(&mut out, 0);
+    // Rive packs four 2-bit types per u32 word and leaves the upper 24 bits zero.
+    for chunk in file.toc.chunks(4) {
+        let word = chunk.iter().enumerate().fold(0u32, |w, (i, (_, t))| w | (t.toc_bits() << (i * 2)));
+        out.extend_from_slice(&word.to_le_bytes());
+    }
+    for o in &file.objects {
+        put_varuint(&mut out, o.type_key);
+        for p in &o.properties {
+            put_varuint(&mut out, p.key);
+            put_value(&mut out, &p.value);
+        }
+        put_varuint(&mut out, 0);
+    }
+    out
 }
