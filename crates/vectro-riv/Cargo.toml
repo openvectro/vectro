@@ -1,0 +1,10 @@
+[package]
+name = "vectro-riv"
+version = "0.1.0"
+description = "Read (and later write) the .riv vector animation format"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde_json = "1"
