@@ -138,7 +138,7 @@
       <div class="ruler-label"></div>
       {#each anim.tracks as t, ti}
         <button class="track-label" class:sel={editor.selected === t.shapeId} onclick={() => (editor.selected = t.shapeId)}>
-          {shapeName(t.shapeId)} · {label(t.prop)}
+          {shapeName(t.shapeId)} · {t.point ? `point ${t.point.index} ${t.prop.replace("point", "").toLowerCase()}` : label(t.prop)}
         </button>
       {/each}
       {#if !anim.tracks.length}<div class="empty">Select a shape, switch to Animate, move the playhead and change a property.</div>{/if}

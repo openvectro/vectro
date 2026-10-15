@@ -3,9 +3,11 @@
 export type ShapeKind = "rectangle" | "ellipse" | "path" | "group";
 export interface Vertex { x: number; y: number; inX: number; inY: number; outX: number; outY: number }
 export interface SubPath { closed: boolean; points: Vertex[] }
-export type Prop =
+export type ShapeProp =
   | "x" | "y" | "width" | "height" | "rotation"
   | "scaleX" | "scaleY" | "opacity" | "cornerRadius" | "fill";
+export type PointProp = "pointX" | "pointY" | "inAngle" | "inLength" | "outAngle" | "outLength";
+export type Prop = ShapeProp | PointProp;
 export type Ease =
   | { type: "hold" }
   | { type: "linear" }
@@ -85,12 +87,12 @@ export function localBounds(s: Shape): { x: number; y: number; w: number; h: num
 }
 
 export interface Key { frame: number; value: number; ease: Ease }
-export interface Track { shapeId: number; prop: Prop; keys: Key[] }
+export interface Track { shapeId: number; prop: Prop; point?: { path: number; index: number }; keys: Key[] }
 export interface Animation { name: string; fps: number; duration: number; loop: LoopMode; tracks: Track[] }
 export interface Artboard { name: string; width: number; height: number; background: number }
 export interface Doc { version: number; artboard: Artboard; shapes: Shape[]; animations: Animation[] }
 
-export const PROPS: { prop: Prop; label: string; step: number; min?: number; max?: number }[] = [
+export const PROPS: { prop: ShapeProp; label: string; step: number; min?: number; max?: number }[] = [
   { prop: "x", label: "X", step: 1 },
   { prop: "y", label: "Y", step: 1 },
   { prop: "width", label: "Width", step: 1, min: 0 },

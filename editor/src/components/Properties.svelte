@@ -1,6 +1,6 @@
 <script lang="ts">
   import { editor } from "../lib/editor.svelte";
-  import { PROPS, argbToHex, hexToArgb, type Prop } from "../lib/types";
+  import { PROPS, argbToHex, hexToArgb, type ShapeProp as Prop } from "../lib/types";
 
   const shape = $derived(editor.shown.find((s) => s.id === editor.selected) ?? null);
   const animating = $derived(editor.mode === "animate");

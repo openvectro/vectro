@@ -128,9 +128,21 @@ pub enum Prop {
     Opacity,
     CornerRadius,
     Fill,
+    /// Point animation, for tracks with a `point`: its position, and its curve handles as an
+    /// angle (degrees) and a length, the way Rive stores them.
+    PointX,
+    PointY,
+    InAngle,
+    InLength,
+    OutAngle,
+    OutLength,
 }
 
 impl Prop {
+    pub fn is_point(self) -> bool {
+        matches!(self, Prop::PointX | Prop::PointY | Prop::InAngle | Prop::InLength | Prop::OutAngle | Prop::OutLength)
+    }
+
     pub const ALL: [Prop; 10] = [
         Prop::X,
         Prop::Y,
@@ -156,6 +168,7 @@ impl Prop {
             Prop::Opacity => s.opacity as f64,
             Prop::CornerRadius => s.corner_radius as f64,
             Prop::Fill => s.fill as f64,
+            _ => 0.0,
         }
     }
 
@@ -171,6 +184,7 @@ impl Prop {
             Prop::Opacity => s.opacity = v as f32,
             Prop::CornerRadius => s.corner_radius = v as f32,
             Prop::Fill => s.fill = v as u32,
+            _ => {}
         }
     }
 }
@@ -193,11 +207,22 @@ pub struct Key {
     pub ease: Ease,
 }
 
+/// One point of a path shape: outline `path`, point `index`.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[serde(rename_all = "camelCase")]
+pub struct PointRef {
+    pub path: u32,
+    pub index: u32,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Track {
     pub shape_id: u32,
     pub prop: Prop,
+    /// Set for point animation (Prop::PointX and friends).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub point: Option<PointRef>,
     pub keys: Vec<Key>,
 }
 
@@ -362,10 +387,33 @@ impl Document {
     pub fn evaluate(&self, anim: Option<usize>, frame: f64) -> Vec<Shape> {
         let mut shapes = self.shapes.clone();
         if let Some(a) = anim.and_then(|i| self.animations.get(i)) {
-            for t in &a.tracks {
+            for t in a.tracks.iter().filter(|t| t.point.is_none()) {
                 if let (Some(s), Some(v)) = (shapes.iter_mut().find(|s| s.id == t.shape_id), t.value_at(frame)) {
                     t.prop.set(s, v);
                 }
+            }
+            // Points: work in Rive's terms (position plus polar handles) so playback matches it.
+            for t in a.tracks.iter().filter(|t| t.point.is_some()) {
+                let pr = t.point.unwrap();
+                let (Some(s), Some(v)) = (shapes.iter_mut().find(|s| s.id == t.shape_id), t.value_at(frame)) else { continue };
+                let Some(p) = s.paths.get_mut(pr.path as usize).and_then(|sub| sub.points.get_mut(pr.index as usize)) else { continue };
+                let polar = |hx: f32, hy: f32, x: f32, y: f32| ((hy - y).atan2(hx - x), (hx - x).hypot(hy - y));
+                let (mut ia, mut il) = polar(p.in_x, p.in_y, p.x, p.y);
+                let (mut oa, mut ol) = polar(p.out_x, p.out_y, p.x, p.y);
+                let v = v as f32;
+                match t.prop {
+                    Prop::PointX => p.x = v,
+                    Prop::PointY => p.y = v,
+                    Prop::InAngle => ia = v.to_radians(),
+                    Prop::InLength => il = v,
+                    Prop::OutAngle => oa = v.to_radians(),
+                    Prop::OutLength => ol = v,
+                    _ => {}
+                }
+                p.in_x = p.x + il * ia.cos();
+                p.in_y = p.y + il * ia.sin();
+                p.out_x = p.x + ol * oa.cos();
+                p.out_y = p.y + ol * oa.sin();
             }
         }
         shapes
@@ -412,6 +460,14 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
     // Rive draws earlier components on top, so each container's children go front-most first
     // (last in the editor's list first), depth first so a group comes before what it holds.
     let mut placed = Vec::new();
+    let animated_handles: std::collections::HashSet<(u32, u32, u32)> = doc
+        .animations
+        .iter()
+        .flat_map(|a| &a.tracks)
+        .filter(|t| matches!(t.prop, Prop::InAngle | Prop::InLength | Prop::OutAngle | Prop::OutLength))
+        .filter_map(|t| t.point.map(|p| (t.shape_id, p.path, p.index)))
+        .collect();
+    let mut vertices: std::collections::HashMap<(u32, u32, u32), (u64, bool)> = std::collections::HashMap::new();
     let mut stack: Vec<(u32, u64)> = Vec::new(); // (shape id, parent component), popped in order
     let roots = doc.shapes.iter().filter(|s| s.parent.map_or(true, |p| !doc.shapes.iter().any(|o| o.id == p && o.kind == ShapeKind::Group)));
     for s in roots.collect::<Vec<_>>() {
@@ -467,15 +523,17 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
             ShapeKind::Group => unreachable!("groups are placed above"),
             ShapeKind::Path => {
                 let mut first = None;
-                for sub in &s.paths {
+                for (pi, sub) in s.paths.iter().enumerate() {
                     let path = comp(b.add("PointsPath", &[("parentId", Uint(shape)), ("isClosed", Value::Bool(sub.closed))]));
                     first.get_or_insert(path);
-                    for v in &sub.points {
+                    for (vi, v) in sub.points.iter().enumerate() {
                         let (ix, iy, ox, oy) = (v.in_x - v.x, v.in_y - v.y, v.out_x - v.x, v.out_y - v.y);
-                        if ix.hypot(iy) < 1e-4 && ox.hypot(oy) < 1e-4 {
-                            comp(b.add("StraightVertex", &[("parentId", Uint(path)), ("x", Double(v.x)), ("y", Double(v.y))]));
+                        let key = (s.id, pi as u32, vi as u32);
+                        if ix.hypot(iy) < 1e-4 && ox.hypot(oy) < 1e-4 && !animated_handles.contains(&key) {
+                            let c = comp(b.add("StraightVertex", &[("parentId", Uint(path)), ("x", Double(v.x)), ("y", Double(v.y))]));
+                            vertices.insert(key, (c, false));
                         } else {
-                            comp(b.add("CubicDetachedVertex", &[
+                            let c = comp(b.add("CubicDetachedVertex", &[
                                 ("parentId", Uint(path)),
                                 ("x", Double(v.x)),
                                 ("y", Double(v.y)),
@@ -484,6 +542,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                                 ("outRotation", Double(oy.atan2(ox))),
                                 ("outDistance", Double(ox.hypot(oy))),
                             ]));
+                            vertices.insert(key, (c, true));
                         }
                     }
                 }
@@ -543,7 +602,18 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ShapeKind::Path | ShapeKind::Group => "",
             };
             let (path, colour) = (p.path.unwrap_or(p.shape), p.colour.unwrap_or(p.shape));
+            let vertex = t.point.and_then(|pr| vertices.get(&(t.shape_id, pr.path, pr.index)).copied());
             let entries: Vec<(u64, &str, &str)> = match t.prop {
+                _ if t.prop.is_point() => match (vertex, t.prop) {
+                    (None, _) => vec![],
+                    (Some((v, _)), Prop::PointX) => vec![(v, "CubicDetachedVertex", "x")],
+                    (Some((v, _)), Prop::PointY) => vec![(v, "CubicDetachedVertex", "y")],
+                    (Some((v, true)), Prop::InAngle) => vec![(v, "CubicDetachedVertex", "inRotation")],
+                    (Some((v, true)), Prop::InLength) => vec![(v, "CubicDetachedVertex", "inDistance")],
+                    (Some((v, true)), Prop::OutAngle) => vec![(v, "CubicDetachedVertex", "outRotation")],
+                    (Some((v, true)), Prop::OutLength) => vec![(v, "CubicDetachedVertex", "outDistance")],
+                    _ => vec![],
+                },
                 Prop::Width | Prop::Height | Prop::CornerRadius | Prop::Fill if *kind == ShapeKind::Group => vec![],
                 Prop::X | Prop::Y | Prop::Rotation | Prop::ScaleX | Prop::ScaleY | Prop::Opacity if *kind == ShapeKind::Group => {
                     let name = match t.prop {
@@ -571,6 +641,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                     .collect(),
                 Prop::CornerRadius => vec![],
                 Prop::Fill => vec![(colour, "SolidColor", "colorValue")],
+                _ => vec![],
             };
             for (object, owner, name) in entries {
                 match targets.iter_mut().find(|(o, _)| *o == object) {
@@ -600,7 +671,11 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                         props.push(("value", Color(k.value as u32)));
                         b.add("KeyFrameColor", &props);
                     } else {
-                        let v = if t.prop == Prop::Rotation { (k.value as f32).to_radians() } else { k.value as f32 };
+                        let v = if matches!(t.prop, Prop::Rotation | Prop::InAngle | Prop::OutAngle) {
+                            (k.value as f32).to_radians()
+                        } else {
+                            k.value as f32
+                        };
                         props.push(("value", Double(v)));
                         b.add("KeyFrameDouble", &props);
                     }
@@ -649,6 +724,7 @@ mod tests {
         d.animations[0].tracks.push(Track {
             shape_id: 1,
             prop: Prop::X,
+            point: None,
             keys: vec![
                 Key { frame: 0, value: 100.0, ease: Ease::Cubic { x1: 0.42, y1: 0.0, x2: 0.58, y2: 1.0 } },
                 Key { frame: 60, value: 400.0, ease: Ease::Linear },
@@ -657,6 +733,7 @@ mod tests {
         d.animations[0].tracks.push(Track {
             shape_id: 1,
             prop: Prop::Fill,
+            point: None,
             keys: vec![
                 Key { frame: 0, value: 0xffff0000u32 as f64, ease: Ease::Linear },
                 Key { frame: 60, value: 0xff0000ffu32 as f64, ease: Ease::Linear },
@@ -722,7 +799,7 @@ mod tests {
         g.name = "group".into();
         d.shapes.insert(0, g);
         d.shapes[1].parent = Some(9);
-        d.animations[0].tracks.push(Track { shape_id: 9, prop: Prop::Rotation, keys: vec![Key { frame: 0, value: 0.0, ease: Ease::Linear }, Key { frame: 60, value: 90.0, ease: Ease::Linear }] });
+        d.animations[0].tracks.push(Track { shape_id: 9, prop: Prop::Rotation, point: None, keys: vec![Key { frame: 0, value: 0.0, ease: Ease::Linear }, Key { frame: 60, value: 90.0, ease: Ease::Linear }] });
         let bytes = d.export_riv();
         let file = vectro_riv::read(&bytes, &Schema::bundled()).expect("valid .riv");
         let node = file.objects.iter().position(|o| o.type_name.as_deref() == Some("Node")).expect("a Node");
@@ -730,6 +807,28 @@ mod tests {
         let parent = shape.properties.iter().find(|p| p.name.as_deref() == Some("parentId")).unwrap();
         // Component index = file position - 1 (the backboard comes first).
         assert_eq!(parent.value, Value::Uint(node as u64 - 1));
+    }
+
+    #[test]
+    fn point_animation_bends_a_path_and_exports_to_its_vertex() {
+        let imp = svg::import(r##"<svg viewBox="0 0 100 100"><path d="M0 0 L100 0 L100 100 Z" fill="#fff"/></svg>"##).unwrap();
+        let mut d = Document::new();
+        d.shapes = imp.shapes;
+        let id = d.shapes[0].id;
+        let x0 = d.shapes[0].paths[0].points[1].x as f64;
+        let pt = Some(PointRef { path: 0, index: 1 });
+        d.animations[0].tracks.push(Track { shape_id: id, prop: Prop::PointX, point: pt, keys: vec![
+            Key { frame: 0, value: x0, ease: Ease::Linear }, Key { frame: 60, value: x0 + 20.0, ease: Ease::Linear }] });
+        d.animations[0].tracks.push(Track { shape_id: id, prop: Prop::OutAngle, point: pt, keys: vec![
+            Key { frame: 0, value: 90.0, ease: Ease::Linear }] });
+        let mid = d.evaluate(Some(0), 30.0);
+        assert!((mid[0].paths[0].points[1].x as f64 - (x0 + 10.0)).abs() < 1e-3);
+        let file = vectro_riv::read(&d.export_riv(), &Schema::bundled()).expect("valid .riv");
+        let names: Vec<_> = file.objects.iter().filter_map(|o| o.type_name.clone()).collect();
+        assert!(names.iter().any(|n| n == "CubicDetachedVertex"), "an animated handle forces a curve point");
+        let keyed: Vec<u64> = file.objects.iter().filter(|o| o.type_name.as_deref() == Some("KeyedProperty"))
+            .filter_map(|o| match o.properties[0].value { Value::Uint(k) => Some(k), _ => None }).collect();
+        assert!(keyed.contains(&24) && keyed.contains(&86), "keys Vertex.x (24) and outRotation (86)");
     }
 
     #[test]

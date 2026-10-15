@@ -1,5 +1,5 @@
 import * as core from "../wasm/vectro_wasm.js";
-import { EASES, type Doc, type Ease, type Prop, type Shape, type ShapeKind, type Track } from "./types";
+import { EASES, type Doc, type Ease, type ShapeProp as Prop, type Shape, type ShapeKind, type Track } from "./types";
 
 const STORAGE = "vectro.document";
 export type Tool = "select" | "rectangle" | "ellipse";
@@ -126,7 +126,7 @@ class Editor {
   }
 
   track(shapeId: number, prop: Prop): Track | undefined {
-    return this.animation?.tracks.find((t) => t.shapeId === shapeId && t.prop === prop);
+    return this.animation?.tracks.find((t) => t.shapeId === shapeId && t.prop === prop && !t.point);
   }
 
   keyAtPlayhead(shapeId: number, prop: Prop) {
