@@ -52,3 +52,32 @@ All five sample files read to the last byte (502 to 850 objects each).
 - Writing `.riv` (next): round-trip read then write must give identical bytes
 - Embedded assets (images, fonts) inside `FileAssetContents`
 - Newer features: data binding, layouts, scripting, text
+
+## Writing: what we learned the hard way (2026-10-15)
+
+- **Table of contents packing.** Rive starts a new u32 word every **four** keys and uses only
+  its low 8 bits. Packing sixteen keys per word reads back the same but is 12 bytes short
+  on a 16-key file. With four per word, all five sample files round-trip byte for byte.
+- **Property names repeat across types.** `scaleX`, `value`, `name` and others exist on several
+  types with different keys. Always resolve a property through the object's own type chain
+  (`Schema::property_key(type, property)`), never by name alone.
+- **References are indices, not ids.** `parentId`, `objectId` and listener `targetId` index the
+  artboard's components (artboard = 0). `animationId` indexes the artboard's animations,
+  `inputId` the state machine's inputs, and `stateToId` the states of the current layer, in file order.
+- **Listeners.** `StateMachineListenerSingle` (type 114) with `targetId` and
+  `listenerTypeValue` (0 enter, 1 exit, 2 down, 3 up, 4 move, 6 click), followed by its actions,
+  for example `ListenerBoolChange` with `value` 0 false, 1 true, 2 toggle.
+- **Bool conditions.** `opValue` 0 means "input is true", 1 means "input is false".
+
+## Proof: a button made from scratch
+
+`cargo run --release --example button -- tests/web/button.riv` writes a 590-byte file: one
+rounded rectangle, three poses (Idle, Hover, Pressed), a state machine with `hover` and
+`pressed` inputs, 150 ms blends, and four pointer listeners. Nothing in it came from the
+Rive editor.
+
+`tests/web/play.html?file=button.riv&v=<runtime version>` plays it with Rive's own web runtime.
+Checked with real mouse events on 2.35.4 and 2.44.2: outside → Idle, over → Hover,
+down → Pressed, up → Hover, away → Idle. The colours on screen match the file exactly.
+Test pages must give the canvas a CSS size; without one, a 2× screen doubles it and the
+pointer misses.

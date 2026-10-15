@@ -2,3 +2,4 @@ target/
 # company animations used as local test files only, never committed
 *.riv
 !tests/fixtures/*.riv
+!tests/web/*.riv

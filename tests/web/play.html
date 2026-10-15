@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Vectro test player</title>
+<style>body{margin:0;background:#111;color:#ddd;font:14px system-ui}canvas{display:block;background:#222;width:300px;height:200px}</style>
+<canvas id="c" width="300" height="200"></canvas>
+<pre id="log"></pre>
+<script>
+// ?v= picks the runtime version (default 2.35.4); the player starts once it has loaded.
+const runtime = document.createElement("script");
+runtime.src = "https://cdn.jsdelivr.net/npm/@rive-app/canvas@" + (new URLSearchParams(location.search).get("v") || "2.35.4") + "/rive.js";
+runtime.onload = start;
+document.head.appendChild(runtime);
+function start() {
+// Loads ?file=... with Rive's own web runtime and records what it reports.
+const params = new URLSearchParams(location.search);
+const sm = params.get("sm") || "Button";
+window.report = { loaded: false, error: null, states: [], inputs: [] };
+const log = (m) => (document.getElementById("log").textContent += m + "\n");
+const r = new rive.Rive({
+  src: params.get("file"),
+  canvas: document.getElementById("c"),
+  stateMachines: sm,
+  autoplay: true,
+  onLoad: () => {
+    report.loaded = true;
+    report.artboard = r.activeArtboard;
+    report.inputs = r.stateMachineInputs(sm).map((i) => i.name + "=" + i.value);
+    r.resizeDrawingSurfaceToCanvas();
+    log("loaded " + JSON.stringify(report));
+  },
+  onLoadError: (e) => { report.error = String(e && (e.data || e.message || e)); log("error " + report.error); },
+  onStateChange: (e) => { report.states.push(...e.data); log("state " + e.data); },
+});
+window.inputs = () => r.stateMachineInputs(sm).map((i) => i.name + "=" + i.value);
+window.__rive = r;
+}
+window.setInput = (name, value) => { r.stateMachineInputs(sm).find((i) => i.name === name).value = value; };
+</script>

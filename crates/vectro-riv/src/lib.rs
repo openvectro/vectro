@@ -131,6 +131,8 @@ impl std::error::Error for Error {}
 /// Type and property names from Rive's generated definitions.
 pub struct Schema {
     types: HashMap<u64, String>,
+    /// type name -> (parent type name, property name -> key)
+    chain: HashMap<String, (String, HashMap<String, u64>)>,
     props: HashMap<u64, (String, Option<FieldType>)>,
 }
 
@@ -143,6 +145,15 @@ impl Schema {
             .iter()
             .map(|(k, v)| (k.parse().unwrap(), v["name"].as_str().unwrap().to_string()))
             .collect();
+        let mut chain: HashMap<String, (String, HashMap<String, u64>)> = HashMap::new();
+        for (k, v) in json["properties"].as_object().unwrap() {
+            let owner = v["owner"].as_str().unwrap().to_string();
+            chain.entry(owner).or_default().1.insert(v["name"].as_str().unwrap().to_string(), k.parse().unwrap());
+        }
+        for v in json["types"].as_object().unwrap().values() {
+            let entry = chain.entry(v["name"].as_str().unwrap().to_string()).or_default();
+            entry.0 = v["parent"].as_str().unwrap().to_string();
+        }
         let props = json["properties"]
             .as_object()
             .unwrap()
@@ -152,7 +163,7 @@ impl Schema {
                 (k.parse().unwrap(), (v["name"].as_str().unwrap().to_string(), ty))
             })
             .collect();
-        Schema { types, props }
+        Schema { types, chain, props }
     }
 
     pub fn type_name(&self, key: u64) -> Option<&str> {
@@ -163,8 +174,20 @@ impl Schema {
         self.types.iter().find(|(_, n)| n.as_str() == name).map(|(k, _)| *k)
     }
 
-    pub fn property_key(&self, name: &str) -> Option<u64> {
-        self.props.iter().find(|(_, (n, _))| n == name).map(|(k, _)| *k)
+    /// The key of `property` as seen on `type_name`, searching up its parent types.
+    pub fn property_key(&self, type_name: &str, property: &str) -> Option<u64> {
+        let mut current = type_name;
+        for _ in 0..32 {
+            let (parent, props) = self.chain.get(current)?;
+            if let Some(k) = props.get(property) {
+                return Some(*k);
+            }
+            if parent.is_empty() || parent == current {
+                return None;
+            }
+            current = parent;
+        }
+        None
     }
 
     pub fn property_type(&self, key: u64) -> Option<FieldType> {
