@@ -81,3 +81,9 @@ Checked with real mouse events on 2.35.4 and 2.44.2: outside → Idle, over → 
 down → Pressed, up → Hover, away → Idle. The colours on screen match the file exactly.
 Test pages must give the canvas a CSS size; without one, a 2× screen doubles it and the
 pointer misses.
+
+## Draw order (2026-10-15)
+
+Rive paints components that come **earlier** in the file on top. The editor keeps the
+usual convention (later in the list = in front), so the export writes shapes front-first.
+Checked by overlapping two shapes and reading the pixel from Rive's runtime, both ways round.

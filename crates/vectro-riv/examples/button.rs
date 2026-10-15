@@ -3,43 +3,14 @@
 //!
 //! cargo run --release --example button -- out/button.riv
 
-use vectro_riv::{write, FieldType, Object, Property, RivFile, Schema, Value};
-
-struct Builder<'s> {
-    schema: &'s Schema,
-    objects: Vec<Object>,
-    used: Vec<u64>,
-}
-
-impl<'s> Builder<'s> {
-    fn add(&mut self, type_name: &str, props: &[(&str, Value)]) {
-        let type_key = self.schema.type_key(type_name).unwrap_or_else(|| panic!("unknown type {type_name}"));
-        let properties = props
-            .iter()
-            .map(|(name, value)| {
-                let key = self.schema.property_key(type_name, name).unwrap_or_else(|| panic!("{type_name} has no property {name}"));
-                if !self.used.contains(&key) {
-                    self.used.push(key);
-                }
-                Property { key, name: Some(name.to_string()), value: value.clone() }
-            })
-            .collect();
-        self.objects.push(Object { type_key, type_name: Some(type_name.into()), properties });
-    }
-
-    fn finish(self) -> RivFile {
-        // List every property we use in the table of contents so any runtime can skip what it lacks.
-        let toc = self.used.iter().map(|k| (*k, self.schema.property_type(*k).unwrap_or(FieldType::Uint))).collect();
-        RivFile { major: 7, minor: 0, file_id: 1, toc, objects: self.objects }
-    }
-}
+use vectro_riv::{write, Builder, Schema, Value};
 
 use Value::{Color, Double, String as Str, Uint};
 
 fn main() {
     let out = std::env::args().nth(1).unwrap_or_else(|| "button.riv".into());
     let schema = Schema::bundled();
-    let mut b = Builder { schema: &schema, objects: Vec::new(), used: Vec::new() };
+    let mut b = Builder::new(&schema);
 
     // Artboard components are referenced by index: 0 artboard, 1 shape, 2 rect, 3 fill, 4 colour.
     b.add("Backboard", &[]);
@@ -71,9 +42,9 @@ fn main() {
     b.add("StateMachineBool", &[("name", Str("pressed".into()))]); // input 1
     b.add("StateMachineLayer", &[("name", Str("Layer 1".into()))]);
     // States by index: 0 entry, 1 any, 2 exit, 3 Idle, 4 Hover, 5 Pressed. Transitions follow their source.
-    let to = |b: &mut Builder, state: u64| b.add("StateTransition", &[("stateToId", Uint(state)), ("duration", Uint(150))]);
+    let to = |b: &mut Builder, state: u64| _ = b.add("StateTransition", &[("stateToId", Uint(state)), ("duration", Uint(150))]);
     let when = |b: &mut Builder, input: u64, is_true: bool| {
-        b.add("TransitionBoolCondition", &[("inputId", Uint(input)), ("opValue", Uint(if is_true { 0 } else { 1 }))])
+        _ = b.add("TransitionBoolCondition", &[("inputId", Uint(input)), ("opValue", Uint(if is_true { 0 } else { 1 }))])
     };
     b.add("EntryState", &[]);
     to(&mut b, 3);

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/vectro-riv"]
+members = ["crates/vectro-riv", "crates/vectro-doc", "crates/vectro-wasm"]
 
 [workspace.package]
 edition = "2021"

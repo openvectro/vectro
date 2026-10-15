@@ -366,3 +366,46 @@ pub fn write(file: &RivFile) -> Vec<u8> {
     }
     out
 }
+
+/// Builds a file object by object, looking up keys by name through each type's chain
+/// and listing every property it uses in the table of contents.
+pub struct Builder<'s> {
+    schema: &'s Schema,
+    objects: Vec<Object>,
+    used: Vec<u64>,
+}
+
+impl<'s> Builder<'s> {
+    pub fn new(schema: &'s Schema) -> Self {
+        Builder { schema, objects: Vec::new(), used: Vec::new() }
+    }
+
+    /// Append an object; returns its position in the file.
+    pub fn add(&mut self, type_name: &str, props: &[(&str, Value)]) -> usize {
+        let type_key = self.schema.type_key(type_name).unwrap_or_else(|| panic!("unknown type {type_name}"));
+        let properties = props
+            .iter()
+            .map(|(name, value)| {
+                let key = self
+                    .schema
+                    .property_key(type_name, name)
+                    .unwrap_or_else(|| panic!("{type_name} has no property {name}"));
+                if !self.used.contains(&key) {
+                    self.used.push(key);
+                }
+                Property { key, name: Some(name.to_string()), value: value.clone() }
+            })
+            .collect();
+        self.objects.push(Object { type_key, type_name: Some(type_name.into()), properties });
+        self.objects.len() - 1
+    }
+
+    pub fn schema(&self) -> &Schema {
+        self.schema
+    }
+
+    pub fn finish(self) -> RivFile {
+        let toc = self.used.iter().map(|k| (*k, self.schema.property_type(*k).unwrap_or(FieldType::Uint))).collect();
+        RivFile { major: SUPPORTED_MAJOR, minor: 0, file_id: 1, toc, objects: self.objects }
+    }
+}

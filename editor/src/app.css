@@ -1,0 +1,24 @@
+:root {
+  --bg: #16161a;
+  --panel: #1f1f24;
+  --panel-2: #26262c;
+  --line: #33333b;
+  --text: #e6e6ea;
+  --muted: #8b8b96;
+  --accent: #5c7cfa;
+  --accent-soft: #5c7cfa33;
+  --key: #fcc419;
+  --danger: #ff6b6b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 13px/1.4 "Inter", system-ui, -apple-system, sans-serif; overflow: hidden; }
+button, input, select { font: inherit; color: inherit; }
+button { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button:hover { border-color: #4a4a55; }
+button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+button:disabled { opacity: 0.4; cursor: default; }
+input, select { background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 3px 6px; min-width: 0; }
+input:focus, select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+.panel-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 10px 12px 6px; }

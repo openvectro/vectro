@@ -9,15 +9,37 @@ they publish.
 
 ## Status
 
-Early. `vectro-riv` reads `.riv` (format 7). Writer and editor come next.
+Early, but it works end to end. Draw rectangles and ellipses, key position, size,
+rotation, scale, opacity, corner radius and colour on a timeline with easing, play it
+back, and export `.riv`. Rive's own web runtime plays the export the same way the editor
+shows it (checked frame by frame). State machines in the editor come next; the format
+side is already proven (`crates/vectro-riv/examples/button.rs`).
+
+## Run the editor
+
+```
+cd editor
+npm install
+npm run wasm   # builds the Rust core for the browser (needs wasm-pack)
+npm run dev    # http://127.0.0.1:5173
+```
+
+Keys: V select, R rectangle, E ellipse, Space play, ⌫ delete, ⌘Z / ⇧⌘Z undo / redo.
+
+## Tools
 
 ```
 cargo run --release --bin riv-dump -- path/to/file.riv
+cargo run --release --bin riv-roundtrip -- path/to/*.riv
+cargo test
 ```
 
 ## Layout
 
-- `crates/vectro-riv` reader (writer to follow) and `riv-dump`
+- `crates/vectro-riv` reads and writes `.riv`; `riv-dump`, `riv-roundtrip`
+- `crates/vectro-doc` the document, playback maths and `.riv` export
+- `crates/vectro-wasm` the core compiled for the browser
+- `editor/` the web editor (Svelte), with a preview that uses Rive's own runtime
 - `data/rive-keys.json` type and property table from Rive's MIT runtime
 - `docs/format.md` what the format holds, confirmed on real files
 
