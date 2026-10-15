@@ -1,6 +1,8 @@
 // Mirrors crates/vectro-doc. The document travels to Rust as JSON.
 
-export type ShapeKind = "rectangle" | "ellipse";
+export type ShapeKind = "rectangle" | "ellipse" | "path";
+export interface Vertex { x: number; y: number; inX: number; inY: number; outX: number; outY: number }
+export interface SubPath { closed: boolean; points: Vertex[] }
 export type Prop =
   | "x" | "y" | "width" | "height" | "rotation"
   | "scaleX" | "scaleY" | "opacity" | "cornerRadius" | "fill";
@@ -24,6 +26,37 @@ export interface Shape {
   opacity: number;
   cornerRadius: number;
   fill: number; // ARGB
+  paths?: SubPath[];
+  fillRule?: "nonZero" | "evenOdd";
+}
+
+/** SVG path data for a path shape, relative to its origin. */
+export function pathData(s: Shape): string {
+  let d = "";
+  for (const sub of s.paths ?? []) {
+    const pts = sub.points;
+    if (!pts.length) continue;
+    d += `M${pts[0].x} ${pts[0].y}`;
+    const n = sub.closed ? pts.length : pts.length - 1;
+    for (let i = 0; i < n; i++) {
+      const a = pts[i], b = pts[(i + 1) % pts.length];
+      d += `C${a.outX} ${a.outY} ${b.inX} ${b.inY} ${b.x} ${b.y}`;
+    }
+    if (sub.closed) d += "Z";
+  }
+  return d;
+}
+
+/** Bounds of what a shape draws, relative to its origin (before rotation and scale). */
+export function localBounds(s: Shape): { x: number; y: number; w: number; h: number } {
+  if (s.kind !== "path" || !s.paths?.length) return { x: -s.width / 2, y: -s.height / 2, w: s.width, h: s.height };
+  let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+  for (const v of s.paths.flatMap((p) => p.points)) {
+    for (const [x, y] of [[v.x, v.y], [v.inX, v.inY], [v.outX, v.outY]]) {
+      l = Math.min(l, x); t = Math.min(t, y); r = Math.max(r, x); b = Math.max(b, y);
+    }
+  }
+  return { x: l, y: t, w: r - l, h: b - t };
 }
 
 export interface Key { frame: number; value: number; ease: Ease }

@@ -4,6 +4,19 @@
 
   let { onPreview }: { onPreview: () => void } = $props();
   let fileInput: HTMLInputElement;
+  let svgInput: HTMLInputElement;
+
+  async function importSvg(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const n = editor.importSvg(await file.text());
+      if (!n) editor.error = `${file.name} had no filled shapes to import`;
+    } catch (err) {
+      editor.error = `Could not import ${file.name}: ${err}`;
+    }
+    svgInput.value = "";
+  }
 
   const tools: { tool: Tool; label: string; key: string }[] = [
     { tool: "select", label: "Select", key: "V" },
@@ -64,12 +77,14 @@
     <button class="error" onclick={() => (editor.error = null)} title="Dismiss">{editor.error}</button>
   {/if}
   <div class="group">
+    <button onclick={() => svgInput.click()} title="Add the shapes from an SVG file">Import SVG</button>
     <button onclick={() => fileInput.click()}>Open</button>
     <button onclick={() => download(JSON.stringify(editor.doc, null, 1), `${slug()}.vectro.json`, "application/json")}>Save</button>
     <button onclick={onPreview}>Preview</button>
     <button class="active" onclick={exportRiv}>Export .riv</button>
   </div>
   <input type="file" accept=".json,application/json" bind:this={fileInput} onchange={openFile} hidden />
+  <input type="file" accept=".svg,image/svg+xml" bind:this={svgInput} onchange={importSvg} hidden />
 </header>
 
 <style>

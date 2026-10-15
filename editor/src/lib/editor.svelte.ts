@@ -194,6 +194,17 @@ class Editor {
     this.selectedKey = null;
   }
 
+  importSvg(svg: string) {
+    const next = JSON.parse(core.importSvg(JSON.stringify(this.doc), svg)) as Doc;
+    this.checkpoint();
+    const before = new Set(this.doc.shapes.map((s) => s.id));
+    this.doc = next;
+    this.mode = "design";
+    const added = next.shapes.filter((s) => !before.has(s.id));
+    this.selected = added.length ? added[added.length - 1].id : this.selected;
+    return added.length;
+  }
+
   exportRiv(): Uint8Array {
     return core.exportRiv(JSON.stringify(this.doc));
   }

@@ -9,7 +9,7 @@ they publish.
 
 ## Status
 
-Early, but it works end to end. Draw rectangles and ellipses, key position, size,
+Early, but it works end to end. Draw rectangles and ellipses or import SVG paths, key position, size,
 rotation, scale, opacity, corner radius and colour on a timeline with easing, play it
 back, and export `.riv`. Rive's own web runtime plays the export the same way the editor
 shows it (checked frame by frame). State machines in the editor come next; the format
@@ -29,6 +29,8 @@ Keys: V select, R rectangle, E ellipse, Space play, ⌫ delete, ⌘Z / ⇧⌘Z u
 ## Tools
 
 ```
+cargo run --release --bin vectro -- import-svg logo.svg > logo.vectro.json
+cargo run --release --bin vectro -- export logo.vectro.json logo.riv
 cargo run --release --bin riv-dump -- path/to/file.riv
 cargo run --release --bin riv-roundtrip -- path/to/*.riv
 cargo test

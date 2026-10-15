@@ -25,7 +25,7 @@
     {#each layers as s (s.id)}
       <li class:selected={editor.selected === s.id}>
         <button class="row" onclick={() => (editor.selected = s.id)} ondblclick={() => (renaming = s.id)}>
-          <span class="swatch" class:round={s.kind === "ellipse"} style:background={argbToCss(s.fill)}></span>
+          <span class="swatch" class:round={s.kind === "ellipse"} class:path={s.kind === "path"} style:background={argbToCss(s.fill)}></span>
           {#if renaming === s.id}
             <!-- svelte-ignore a11y_autofocus -->
             <input value={s.name} autofocus onblur={(e) => rename(s.id, e.currentTarget.value)}
@@ -52,6 +52,7 @@
   .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .swatch { width: 14px; height: 14px; border-radius: 3px; flex: none; }
   .swatch.round { border-radius: 50%; }
+  .swatch.path { border-radius: 2px 7px 2px 7px; }
   .order { display: none; gap: 2px; padding-right: 4px; }
   li:hover .order { display: flex; }
   .order button { padding: 0 5px; font-size: 11px; }

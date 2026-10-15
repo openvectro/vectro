@@ -4,6 +4,8 @@
 use serde::{Deserialize, Serialize};
 use vectro_riv::{write, Builder, Schema, Value};
 
+pub mod svg;
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Document {
@@ -28,6 +30,34 @@ pub struct Artboard {
 pub enum ShapeKind {
     Rectangle,
     Ellipse,
+    Path,
+}
+
+/// A path point with its incoming and outgoing curve handles, relative to the shape's origin.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Vertex {
+    pub x: f32,
+    pub y: f32,
+    pub in_x: f32,
+    pub in_y: f32,
+    pub out_x: f32,
+    pub out_y: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct SubPath {
+    pub closed: bool,
+    pub points: Vec<Vertex>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[serde(rename_all = "camelCase")]
+pub enum FillRule {
+    #[default]
+    NonZero,
+    EvenOdd,
 }
 
 /// A shape's design values. Position is its centre; rotation is in degrees.
@@ -48,6 +78,36 @@ pub struct Shape {
     pub corner_radius: f32,
     /// ARGB
     pub fill: u32,
+    /// Outlines of a path shape; empty for rectangles and ellipses.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub paths: Vec<SubPath>,
+    #[serde(default)]
+    pub fill_rule: FillRule,
+}
+
+impl Shape {
+    /// Bounds of a path's points (handles included), relative to its origin.
+    pub fn path_bounds(&self) -> Option<(f32, f32, f32, f32)> {
+        let mut it = self.paths.iter().flat_map(|p| &p.points).flat_map(|v| [(v.x, v.y), (v.in_x, v.in_y), (v.out_x, v.out_y)]);
+        let first = it.next()?;
+        Some(it.fold((first.0, first.1, first.0, first.1), |(a, b, c, d), (x, y)| (a.min(x), b.min(y), c.max(x), d.max(y))))
+    }
+
+    /// Move a path's origin to the centre of its bounds without moving it on screen.
+    pub fn recentre(&mut self) {
+        let Some((l, t, r, b)) = self.path_bounds() else { return };
+        let (cx, cy) = ((l + r) / 2.0, (t + b) / 2.0);
+        for v in self.paths.iter_mut().flat_map(|p| p.points.iter_mut()) {
+            for (x, y) in [(&mut v.x, &mut v.y), (&mut v.in_x, &mut v.in_y), (&mut v.out_x, &mut v.out_y)] {
+                *x -= cx;
+                *y -= cy;
+            }
+        }
+        self.x += cx;
+        self.y += cy;
+        self.width = r - l;
+        self.height = b - t;
+    }
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -251,6 +311,33 @@ impl Track {
 }
 
 impl Document {
+    /// Add an SVG's shapes, scaled to fit inside the artboard with a margin and centred.
+    pub fn import_svg(&mut self, svg: &str) -> Result<Vec<u32>, String> {
+        let imp = svg::import(svg)?;
+        let ab = &self.artboard;
+        let k = (ab.width * 0.8 / imp.width).min(ab.height * 0.8 / imp.height).min(1.0);
+        let (ox, oy) = ((ab.width - imp.width * k) / 2.0, (ab.height - imp.height * k) / 2.0);
+        let mut next = self.shapes.iter().map(|s| s.id).max().unwrap_or(0);
+        let mut ids = Vec::new();
+        for mut s in imp.shapes {
+            next += 1;
+            s.id = next;
+            s.x = s.x * k + ox;
+            s.y = s.y * k + oy;
+            s.width *= k;
+            s.height *= k;
+            s.corner_radius *= k;
+            for v in s.paths.iter_mut().flat_map(|p| p.points.iter_mut()) {
+                for c in [&mut v.x, &mut v.y, &mut v.in_x, &mut v.in_y, &mut v.out_x, &mut v.out_y] {
+                    *c *= k;
+                }
+            }
+            ids.push(s.id);
+            self.shapes.push(s);
+        }
+        Ok(ids)
+    }
+
     pub fn new() -> Self {
         Document {
             version: 1,
@@ -348,8 +435,36 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ("width", Double(s.width)),
                 ("height", Double(s.height)),
             ])),
+            ShapeKind::Path => {
+                let mut first = None;
+                for sub in &s.paths {
+                    let path = comp(b.add("PointsPath", &[("parentId", Uint(shape)), ("isClosed", Value::Bool(sub.closed))]));
+                    first.get_or_insert(path);
+                    for v in &sub.points {
+                        let (ix, iy, ox, oy) = (v.in_x - v.x, v.in_y - v.y, v.out_x - v.x, v.out_y - v.y);
+                        if ix.hypot(iy) < 1e-4 && ox.hypot(oy) < 1e-4 {
+                            comp(b.add("StraightVertex", &[("parentId", Uint(path)), ("x", Double(v.x)), ("y", Double(v.y))]));
+                        } else {
+                            comp(b.add("CubicDetachedVertex", &[
+                                ("parentId", Uint(path)),
+                                ("x", Double(v.x)),
+                                ("y", Double(v.y)),
+                                ("inRotation", Double(iy.atan2(ix))),
+                                ("inDistance", Double(ix.hypot(iy))),
+                                ("outRotation", Double(oy.atan2(ox))),
+                                ("outDistance", Double(ox.hypot(oy))),
+                            ]));
+                        }
+                    }
+                }
+                first.unwrap_or(shape)
+            }
         };
-        let fill = comp(b.add("Fill", &[("parentId", Uint(shape))]));
+        let fill_rule = match s.fill_rule {
+            FillRule::NonZero => 0,
+            FillRule::EvenOdd => 1,
+        };
+        let fill = comp(b.add("Fill", &[("parentId", Uint(shape)), ("fillRule", Uint(fill_rule))]));
         let colour = comp(b.add("SolidColor", &[("parentId", Uint(fill)), ("colorValue", Color(s.fill))]));
         placed.push((s.id, s.kind, Placed { shape, path, colour }));
     }
@@ -392,7 +507,11 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 continue;
             }
             let Some((_, kind, p)) = placed.iter().find(|(id, _, _)| *id == t.shape_id) else { continue };
-            let path_type = if *kind == ShapeKind::Rectangle { "Rectangle" } else { "Ellipse" };
+            let path_type = match kind {
+                ShapeKind::Rectangle => "Rectangle",
+                ShapeKind::Ellipse => "Ellipse",
+                ShapeKind::Path => "",
+            };
             let entries: Vec<(u64, &str, &str)> = match t.prop {
                 Prop::X => vec![(p.shape, "Shape", "x")],
                 Prop::Y => vec![(p.shape, "Shape", "y")],
@@ -400,6 +519,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 Prop::ScaleX => vec![(p.shape, "Shape", "scaleX")],
                 Prop::ScaleY => vec![(p.shape, "Shape", "scaleY")],
                 Prop::Opacity => vec![(p.shape, "Shape", "opacity")],
+                Prop::Width | Prop::Height if *kind == ShapeKind::Path => vec![],
                 Prop::Width => vec![(p.path, path_type, "width")],
                 Prop::Height => vec![(p.path, path_type, "height")],
                 Prop::CornerRadius if *kind == ShapeKind::Rectangle => ["cornerRadiusTL", "cornerRadiusTR", "cornerRadiusBL", "cornerRadiusBR"]
@@ -479,6 +599,8 @@ mod tests {
             opacity: 1.0,
             corner_radius: 0.0,
             fill: 0xffff6b6b,
+            paths: Vec::new(),
+            fill_rule: FillRule::NonZero,
         });
         d.animations[0].tracks.push(Track {
             shape_id: 1,
@@ -532,6 +654,19 @@ mod tests {
             assert!(names.iter().any(|n| n == want), "missing {want}");
         }
         assert_eq!(vectro_riv::write(&file), bytes);
+    }
+
+    #[test]
+    fn svg_paths_export_and_read_back() {
+        let imp = svg::import(r##"<svg viewBox="0 0 100 100"><path d="M10 10 L90 10 C90 60 60 90 10 90 Z" fill="#F9A61A" fill-rule="evenodd"/></svg>"##).unwrap();
+        let mut d = Document::new();
+        d.shapes = imp.shapes;
+        let bytes = d.export_riv();
+        let file = vectro_riv::read(&bytes, &Schema::bundled()).expect("valid .riv");
+        let count = |n: &str| file.objects.iter().filter(|o| o.type_name.as_deref() == Some(n)).count();
+        assert_eq!(count("PointsPath"), 1);
+        assert_eq!(count("StraightVertex") + count("CubicDetachedVertex"), 3);
+        assert_eq!(count("CubicDetachedVertex"), 2, "the corners touching the curve carry handles");
     }
 
     #[test]

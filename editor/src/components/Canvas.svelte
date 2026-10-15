@@ -1,6 +1,6 @@
 <script lang="ts">
   import { editor } from "../lib/editor.svelte";
-  import { argbToCss, type Shape } from "../lib/types";
+  import { argbToCss, localBounds, pathData, type Shape } from "../lib/types";
 
   let svg: SVGSVGElement;
   const pad = 60;
@@ -19,7 +19,7 @@
   type Drag =
     | { kind: "create"; x0: number; y0: number; id: number | null }
     | { kind: "move"; id: number; dx: number; dy: number; moved: boolean }
-    | { kind: "resize"; id: number; cx: number; cy: number; rot: number; sx: number; sy: number; moved: boolean };
+    | { kind: "resize"; id: number; cx: number; cy: number; rot: number; sx: number; sy: number; corner: { x: number; y: number } | null; moved: boolean };
   let drag: Drag | null = null;
 
   function down(e: PointerEvent) {
@@ -36,7 +36,9 @@
     if (handle && editor.selected !== null) {
       const s = editor.shown.find((s) => s.id === editor.selected)!;
       editor.checkpoint();
-      drag = { kind: "resize", id: s.id, cx: s.x, cy: s.y, rot: (s.rotation * Math.PI) / 180, sx: s.scaleX, sy: s.scaleY, moved: false };
+      const b = localBounds(s);
+      drag = { kind: "resize", id: s.id, cx: s.x, cy: s.y, rot: (s.rotation * Math.PI) / 180, sx: s.scaleX, sy: s.scaleY,
+        corner: s.kind === "path" ? { x: b.x + b.w, y: b.y + b.h } : null, moved: false };
       return;
     }
     if (target) {
@@ -74,8 +76,15 @@
       const dx = p.x - drag.cx, dy = p.y - drag.cy;
       const lx = dx * Math.cos(-drag.rot) - dy * Math.sin(-drag.rot);
       const ly = dx * Math.sin(-drag.rot) + dy * Math.cos(-drag.rot);
-      editor.setProp(drag.id, "width", Math.max(1, Math.round((2 * Math.abs(lx)) / Math.abs(drag.sx || 1))), false);
-      editor.setProp(drag.id, "height", Math.max(1, Math.round((2 * Math.abs(ly)) / Math.abs(drag.sy || 1))), false);
+      if (drag.corner) {
+        // Paths have no width or height to change: resizing scales them uniformly.
+        const k = Math.max(Math.abs(lx / drag.corner.x || 0), Math.abs(ly / drag.corner.y || 0), 0.01);
+        editor.setProp(drag.id, "scaleX", +k.toFixed(3), false);
+        editor.setProp(drag.id, "scaleY", +k.toFixed(3), false);
+      } else {
+        editor.setProp(drag.id, "width", Math.max(1, Math.round((2 * Math.abs(lx)) / Math.abs(drag.sx || 1))), false);
+        editor.setProp(drag.id, "height", Math.max(1, Math.round((2 * Math.abs(ly)) / Math.abs(drag.sy || 1))), false);
+      }
     }
   }
 
@@ -108,16 +117,19 @@
           {#if s.kind === "rectangle"}
             <rect x={-s.width / 2} y={-s.height / 2} width={s.width} height={s.height}
               rx={Math.min(s.cornerRadius, s.width / 2, s.height / 2)} fill={argbToCss(s.fill)} />
-          {:else}
+          {:else if s.kind === "ellipse"}
             <ellipse rx={s.width / 2} ry={s.height / 2} fill={argbToCss(s.fill)} />
+          {:else}
+            <path d={pathData(s)} fill={argbToCss(s.fill)} fill-rule={s.fillRule === "evenOdd" ? "evenodd" : "nonzero"} />
           {/if}
         </g>
       {/each}
     </g>
     {#each editor.shown.filter((s) => s.id === editor.selected) as s (s.id)}
+      {@const b = localBounds(s)}
       <g transform={transform(s)} class="selection">
-        <rect x={-s.width / 2} y={-s.height / 2} width={s.width} height={s.height} vector-effect="non-scaling-stroke" />
-        <circle cx={s.width / 2} cy={s.height / 2} r="6" data-handle="resize" vector-effect="non-scaling-stroke" />
+        <rect x={b.x} y={b.y} width={b.w} height={b.h} vector-effect="non-scaling-stroke" />
+        <circle cx={b.x + b.w} cy={b.y + b.h} r={6 / Math.max(0.05, Math.abs(s.scaleX))} data-handle="resize" vector-effect="non-scaling-stroke" />
       </g>
     {/each}
   </svg>

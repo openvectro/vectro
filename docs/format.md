@@ -87,3 +87,12 @@ pointer misses.
 Rive paints components that come **earlier** in the file on top. The editor keeps the
 usual convention (later in the list = in front), so the export writes shapes front-first.
 Checked by overlapping two shapes and reading the pixel from Rive's runtime, both ways round.
+
+## Paths (2026-10-15)
+
+A path shape is a `Shape` with one `PointsPath` per outline (`isClosed`), each followed by its
+vertices: `StraightVertex` when both handles sit on the point, otherwise `CubicDetachedVertex`
+with handles in polar form (`inRotation`/`inDistance`, `outRotation`/`outDistance`, radians).
+All outlines of one shape fill together under the `Fill`'s `fillRule` (0 non-zero, 1 even-odd),
+so a ring is two circles with even-odd. Checked by importing Snap's icon SVG: Rive's runtime
+draws it the same as the editor, cut-outs included.

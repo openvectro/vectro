@@ -38,3 +38,11 @@ pub fn export_riv(doc: &str) -> Result<Vec<u8>, JsError> {
 pub fn ease_at(x1: f32, y1: f32, x2: f32, y2: f32, progress: f64) -> f64 {
     cubic_ease(x1, y1, x2, y2, progress)
 }
+
+/// Add an SVG's shapes to the document; returns the new document as JSON.
+#[wasm_bindgen(js_name = importSvg)]
+pub fn import_svg(doc: &str, svg: &str) -> Result<String, JsError> {
+    let mut d = parse(doc)?;
+    d.import_svg(svg).map_err(|e| JsError::new(&e))?;
+    Ok(serde_json::to_string(&d).unwrap())
+}

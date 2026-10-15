@@ -6,7 +6,14 @@
   const animating = $derived(editor.mode === "animate");
   const ab = $derived(editor.doc.artboard);
 
-  const visible = $derived(PROPS.filter((p) => p.prop !== "fill" && !(p.prop === "cornerRadius" && shape?.kind === "ellipse")));
+  const visible = $derived(
+    PROPS.filter((p) => {
+      if (p.prop === "fill") return false;
+      if (p.prop === "cornerRadius") return shape?.kind === "rectangle";
+      if (p.prop === "width" || p.prop === "height") return shape?.kind !== "path";
+      return true;
+    }),
+  );
   const display = (prop: Prop, v: number) => (prop === "opacity" || prop.startsWith("scale") ? +v.toFixed(2) : +v.toFixed(1));
 
   function setArtboard(field: "name" | "width" | "height", value: string) {
