@@ -2,8 +2,20 @@
   import { editor } from "../lib/editor.svelte";
   import { argbToCss } from "../lib/types";
 
-  // Front-most shape first, the way design tools list layers.
-  const layers = $derived([...editor.doc.shapes].reverse());
+  import { isRoot, type Shape } from "../lib/types";
+
+  // Front-most first, the way design tools list layers; a group's pieces sit indented under it.
+  const layers = $derived.by(() => {
+    const out: { s: Shape; depth: number }[] = [];
+    const walk = (list: Shape[], depth: number) => {
+      for (const s of [...list].reverse()) {
+        out.push({ s, depth });
+        if (s.kind === "group" && depth < 32) walk(editor.doc.shapes.filter((c) => c.parent === s.id), depth + 1);
+      }
+    };
+    walk(editor.doc.shapes.filter((s) => isRoot(editor.doc.shapes, s)), 0);
+    return out;
+  });
   let renaming = $state<number | null>(null);
 
   function rename(id: number, name: string) {
@@ -22,10 +34,10 @@
     <p class="empty">Pick Rectangle (R) or Ellipse (E) and drag on the artboard.</p>
   {/if}
   <ul>
-    {#each layers as s (s.id)}
-      <li class:selected={editor.selected === s.id}>
+    {#each layers as { s, depth } (s.id)}
+      <li class:selected={editor.selected === s.id} style:padding-left="{depth * 14}px">
         <button class="row" onclick={() => (editor.selected = s.id)} ondblclick={() => (renaming = s.id)}>
-          <span class="swatch" class:round={s.kind === "ellipse"} class:path={s.kind === "path"} style:background={argbToCss(s.fill)}></span>
+          {#if s.kind === "group"}<span class="group-icon">▾</span>{:else}<span class="swatch" class:round={s.kind === "ellipse"} class:path={s.kind === "path"} style:background={argbToCss(s.fill)}></span>{/if}
           {#if renaming === s.id}
             <!-- svelte-ignore a11y_autofocus -->
             <input value={s.name} autofocus onblur={(e) => rename(s.id, e.currentTarget.value)}
@@ -52,6 +64,7 @@
   .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .swatch { width: 14px; height: 14px; border-radius: 3px; flex: none; }
   .swatch.round { border-radius: 50%; }
+  .group-icon { width: 14px; text-align: center; color: var(--muted); flex: none; }
   .swatch.path { border-radius: 2px 7px 2px 7px; }
   .order { display: none; gap: 2px; padding-right: 4px; }
   li:hover .order { display: flex; }

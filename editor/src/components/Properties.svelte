@@ -9,6 +9,7 @@
   const visible = $derived(
     PROPS.filter((p) => {
       if (p.prop === "fill") return false;
+      if (shape?.kind === "group") return !["width", "height", "cornerRadius"].includes(p.prop);
       if (p.prop === "cornerRadius") return shape?.kind === "rectangle";
       if (p.prop === "width" || p.prop === "height") return shape?.kind !== "path";
       return true;
@@ -39,6 +40,7 @@
             onclick={() => editor.toggleKey(shape.id, p.prop)} title="Key at playhead">◆</button>
         {:else}<span></span>{/if}
       {/each}
+      {#if shape.kind !== "group"}
       <label for="p-fill">Fill</label>
       <input id="p-fill" type="color" value={argbToHex(shape.fill)}
         onchange={(e) => editor.setProp(shape.id, "fill", hexToArgb(e.currentTarget.value, shape.fill >>> 24))} />
@@ -46,6 +48,7 @@
         <button class="key" class:on={!!editor.keyAtPlayhead(shape.id, "fill")} class:has={!!editor.track(shape.id, "fill")}
           onclick={() => editor.toggleKey(shape.id, "fill")} title="Key at playhead">◆</button>
       {:else}<span></span>{/if}
+      {/if}
     </div>
     <p class="hint">
       {animating ? "Changes here set a key at the playhead." : "Switch to Animate to key these over time."}

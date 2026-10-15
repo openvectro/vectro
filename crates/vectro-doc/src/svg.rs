@@ -436,6 +436,7 @@ fn basic(kind: ShapeKind, name: &str, x: f64, y: f64, w: f64, h: f64, rot: f64, 
         fill,
         paths: Vec::new(),
         fill_rule: FillRule::NonZero,
+        parent: None,
     }
 }
 

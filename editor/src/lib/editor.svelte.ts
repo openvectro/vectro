@@ -101,20 +101,28 @@ class Editor {
 
   deleteShape(id: number) {
     this.checkpoint();
-    this.doc.shapes = this.doc.shapes.filter((s) => s.id !== id);
-    for (const a of this.doc.animations) a.tracks = a.tracks.filter((t) => t.shapeId !== id);
+    // A group takes everything inside it along.
+    const gone = new Set([id]);
+    for (let grew = true; grew; ) {
+      grew = false;
+      for (const s of this.doc.shapes) if (s.parent !== undefined && gone.has(s.parent) && !gone.has(s.id)) (gone.add(s.id), (grew = true));
+    }
+    this.doc.shapes = this.doc.shapes.filter((s) => !gone.has(s.id));
+    for (const a of this.doc.animations) a.tracks = a.tracks.filter((t) => !gone.has(t.shapeId));
     if (this.selected === id) this.selected = null;
     this.selectedKey = null;
   }
 
-  /** Move a shape up (towards the front) or down the stack. */
+  /** Swap a shape with its next sibling towards the front (delta 1) or back (-1). */
   reorder(id: number, delta: number) {
-    const i = this.doc.shapes.findIndex((s) => s.id === id);
-    const j = i + delta;
-    if (i < 0 || j < 0 || j >= this.doc.shapes.length) return;
+    const shapes = this.doc.shapes;
+    const i = shapes.findIndex((s) => s.id === id);
+    if (i < 0) return;
+    let j = i + delta;
+    while (j >= 0 && j < shapes.length && shapes[j].parent !== shapes[i].parent) j += delta;
+    if (j < 0 || j >= shapes.length) return;
     this.checkpoint();
-    const [s] = this.doc.shapes.splice(i, 1);
-    this.doc.shapes.splice(j, 0, s);
+    [shapes[i], shapes[j]] = [shapes[j], shapes[i]];
   }
 
   track(shapeId: number, prop: Prop): Track | undefined {

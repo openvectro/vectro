@@ -31,6 +31,8 @@ pub enum ShapeKind {
     Rectangle,
     Ellipse,
     Path,
+    /// Draws nothing itself; its transform and opacity carry its children.
+    Group,
 }
 
 /// A path point with its incoming and outgoing curve handles, relative to the shape's origin.
@@ -83,6 +85,9 @@ pub struct Shape {
     pub paths: Vec<SubPath>,
     #[serde(default)]
     pub fill_rule: FillRule,
+    /// The group this shape sits in; its x/y are then in the group's space.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent: Option<u32>,
 }
 
 impl Shape {
@@ -380,8 +385,8 @@ impl Default for Document {
 /// Artboard component indices for one shape.
 struct Placed {
     shape: u64,
-    path: u64,
-    colour: u64,
+    path: Option<u64>,
+    colour: Option<u64>,
 }
 
 fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
@@ -404,12 +409,36 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
     let bg_fill = comp(b.add("Fill", &[("parentId", Uint(0))]));
     comp(b.add("SolidColor", &[("parentId", Uint(bg_fill)), ("colorValue", Color(ab.background))]));
 
-    // Rive draws earlier components on top, so the front-most shape (last in the editor) goes first.
+    // Rive draws earlier components on top, so each container's children go front-most first
+    // (last in the editor's list first), depth first so a group comes before what it holds.
     let mut placed = Vec::new();
-    for s in doc.shapes.iter().rev() {
+    let mut stack: Vec<(u32, u64)> = Vec::new(); // (shape id, parent component), popped in order
+    let roots = doc.shapes.iter().filter(|s| s.parent.map_or(true, |p| !doc.shapes.iter().any(|o| o.id == p && o.kind == ShapeKind::Group)));
+    for s in roots.collect::<Vec<_>>() {
+        stack.push((s.id, 0));
+    }
+    while let Some((id, parent)) = stack.pop() {
+        let Some(s) = doc.shapes.iter().find(|s| s.id == id) else { continue };
+        if s.kind == ShapeKind::Group {
+            let node = comp(b.add("Node", &[
+                ("name", Str(s.name.clone())),
+                ("parentId", Uint(parent)),
+                ("x", Double(s.x)),
+                ("y", Double(s.y)),
+                ("rotation", Double(s.rotation.to_radians())),
+                ("scaleX", Double(s.scale_x)),
+                ("scaleY", Double(s.scale_y)),
+                ("opacity", Double(s.opacity)),
+            ]));
+            placed.push((s.id, s.kind, Placed { shape: node, path: None, colour: None }));
+            for c in doc.shapes.iter().filter(|c| c.parent == Some(s.id)) {
+                stack.push((c.id, node));
+            }
+            continue;
+        }
         let shape = comp(b.add("Shape", &[
             ("name", Str(s.name.clone())),
-            ("parentId", Uint(0)),
+            ("parentId", Uint(parent)),
             ("x", Double(s.x)),
             ("y", Double(s.y)),
             ("rotation", Double(s.rotation.to_radians())),
@@ -435,6 +464,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ("width", Double(s.width)),
                 ("height", Double(s.height)),
             ])),
+            ShapeKind::Group => unreachable!("groups are placed above"),
             ShapeKind::Path => {
                 let mut first = None;
                 for sub in &s.paths {
@@ -466,7 +496,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
         };
         let fill = comp(b.add("Fill", &[("parentId", Uint(shape)), ("fillRule", Uint(fill_rule))]));
         let colour = comp(b.add("SolidColor", &[("parentId", Uint(fill)), ("colorValue", Color(s.fill))]));
-        placed.push((s.id, s.kind, Placed { shape, path, colour }));
+        placed.push((s.id, s.kind, Placed { shape, path: Some(path), colour: Some(colour) }));
     }
 
     // Each distinct cubic ease becomes one interpolator component that keyframes point at.
@@ -510,9 +540,22 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
             let path_type = match kind {
                 ShapeKind::Rectangle => "Rectangle",
                 ShapeKind::Ellipse => "Ellipse",
-                ShapeKind::Path => "",
+                ShapeKind::Path | ShapeKind::Group => "",
             };
+            let (path, colour) = (p.path.unwrap_or(p.shape), p.colour.unwrap_or(p.shape));
             let entries: Vec<(u64, &str, &str)> = match t.prop {
+                Prop::Width | Prop::Height | Prop::CornerRadius | Prop::Fill if *kind == ShapeKind::Group => vec![],
+                Prop::X | Prop::Y | Prop::Rotation | Prop::ScaleX | Prop::ScaleY | Prop::Opacity if *kind == ShapeKind::Group => {
+                    let name = match t.prop {
+                        Prop::X => "x",
+                        Prop::Y => "y",
+                        Prop::Rotation => "rotation",
+                        Prop::ScaleX => "scaleX",
+                        Prop::ScaleY => "scaleY",
+                        _ => "opacity",
+                    };
+                    vec![(p.shape, "Node", name)]
+                }
                 Prop::X => vec![(p.shape, "Shape", "x")],
                 Prop::Y => vec![(p.shape, "Shape", "y")],
                 Prop::Rotation => vec![(p.shape, "Shape", "rotation")],
@@ -520,14 +563,14 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 Prop::ScaleY => vec![(p.shape, "Shape", "scaleY")],
                 Prop::Opacity => vec![(p.shape, "Shape", "opacity")],
                 Prop::Width | Prop::Height if *kind == ShapeKind::Path => vec![],
-                Prop::Width => vec![(p.path, path_type, "width")],
-                Prop::Height => vec![(p.path, path_type, "height")],
+                Prop::Width => vec![(path, path_type, "width")],
+                Prop::Height => vec![(path, path_type, "height")],
                 Prop::CornerRadius if *kind == ShapeKind::Rectangle => ["cornerRadiusTL", "cornerRadiusTR", "cornerRadiusBL", "cornerRadiusBR"]
                     .into_iter()
-                    .map(|n| (p.path, "Rectangle", n))
+                    .map(|n| (path, "Rectangle", n))
                     .collect(),
                 Prop::CornerRadius => vec![],
-                Prop::Fill => vec![(p.colour, "SolidColor", "colorValue")],
+                Prop::Fill => vec![(colour, "SolidColor", "colorValue")],
             };
             for (object, owner, name) in entries {
                 match targets.iter_mut().find(|(o, _)| *o == object) {
@@ -601,6 +644,7 @@ mod tests {
             fill: 0xffff6b6b,
             paths: Vec::new(),
             fill_rule: FillRule::NonZero,
+            parent: None,
         });
         d.animations[0].tracks.push(Track {
             shape_id: 1,
@@ -667,6 +711,25 @@ mod tests {
         assert_eq!(count("PointsPath"), 1);
         assert_eq!(count("StraightVertex") + count("CubicDetachedVertex"), 3);
         assert_eq!(count("CubicDetachedVertex"), 2, "the corners touching the curve carry handles");
+    }
+
+    #[test]
+    fn groups_export_as_nodes_holding_their_children() {
+        let mut d = demo();
+        let mut g = d.shapes[0].clone();
+        g.id = 9;
+        g.kind = ShapeKind::Group;
+        g.name = "group".into();
+        d.shapes.insert(0, g);
+        d.shapes[1].parent = Some(9);
+        d.animations[0].tracks.push(Track { shape_id: 9, prop: Prop::Rotation, keys: vec![Key { frame: 0, value: 0.0, ease: Ease::Linear }, Key { frame: 60, value: 90.0, ease: Ease::Linear }] });
+        let bytes = d.export_riv();
+        let file = vectro_riv::read(&bytes, &Schema::bundled()).expect("valid .riv");
+        let node = file.objects.iter().position(|o| o.type_name.as_deref() == Some("Node")).expect("a Node");
+        let shape = file.objects.iter().find(|o| o.type_name.as_deref() == Some("Shape")).unwrap();
+        let parent = shape.properties.iter().find(|p| p.name.as_deref() == Some("parentId")).unwrap();
+        // Component index = file position - 1 (the backboard comes first).
+        assert_eq!(parent.value, Value::Uint(node as u64 - 1));
     }
 
     #[test]

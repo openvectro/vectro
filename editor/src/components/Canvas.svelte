@@ -1,6 +1,6 @@
 <script lang="ts">
   import { editor } from "../lib/editor.svelte";
-  import { argbToCss, localBounds, pathData, type Shape } from "../lib/types";
+  import { ancestors, argbToCss, isRoot, localBounds, pathData, transformOf, worldMatrix, type Shape } from "../lib/types";
 
   let svg: SVGSVGElement;
   const pad = 60;
@@ -37,16 +37,20 @@
       const s = editor.shown.find((s) => s.id === editor.selected)!;
       editor.checkpoint();
       const b = localBounds(s);
-      drag = { kind: "resize", id: s.id, cx: s.x, cy: s.y, rot: (s.rotation * Math.PI) / 180, sx: s.scaleX, sy: s.scaleY,
+      const c = worldMatrix(editor.shown, s).transformPoint(new DOMPoint(0, 0));
+      const rotWorld = Math.atan2(worldMatrix(editor.shown, s).b, worldMatrix(editor.shown, s).a);
+      drag = { kind: "resize", id: s.id, cx: c.x, cy: c.y, rot: rotWorld, sx: s.scaleX, sy: s.scaleY,
         corner: s.kind === "path" ? { x: b.x + b.w, y: b.y + b.h } : null, moved: false };
       return;
     }
     if (target) {
-      const id = Number(target.getAttribute("data-id"));
-      editor.selected = id;
-      const s = editor.shown.find((s) => s.id === id)!;
+      // A click picks the outermost group; a double click picks the piece itself.
+      let s = editor.shown.find((s) => s.id === Number(target.getAttribute("data-id")))!;
+      if (e.detail < 2) s = ancestors(editor.shown, s)[0] ?? s;
+      editor.selected = s.id;
       editor.checkpoint();
-      drag = { kind: "move", id, dx: p.x - s.x, dy: p.y - s.y, moved: false };
+      const lp = toParent(s, p);
+      drag = { kind: "move", id: s.id, dx: lp.x - s.x, dy: lp.y - s.y, moved: false };
     } else {
       editor.selected = null;
     }
@@ -68,8 +72,10 @@
       s.height = Math.max(1, Math.round(h));
     } else if (drag.kind === "move") {
       drag.moved = true;
-      editor.setProp(drag.id, "x", Math.round(p.x - drag.dx), false);
-      editor.setProp(drag.id, "y", Math.round(p.y - drag.dy), false);
+      const s = editor.shown.find((s) => s.id === drag!.id)!;
+      const lp = toParent(s, p);
+      editor.setProp(drag.id, "x", Math.round(lp.x - drag.dx), false);
+      editor.setProp(drag.id, "y", Math.round(lp.y - drag.dy), false);
     } else {
       // Resize from the bottom-right handle: measure in the shape's own rotated frame.
       drag.moved = true;
@@ -93,7 +99,18 @@
     drag = null;
   }
 
-  const transform = (s: Shape) => `translate(${s.x} ${s.y}) rotate(${s.rotation}) scale(${s.scaleX} ${s.scaleY})`;
+  const transform = transformOf;
+
+  /** A point in artboard space, expressed in the space a shape's x/y live in (its group's). */
+  function toParent(s: Shape, p: { x: number; y: number }) {
+    const m = worldMatrix(editor.shown, s, false).inverse();
+    const r = m.transformPoint(new DOMPoint(p.x, p.y));
+    return { x: r.x, y: r.y };
+  }
+
+  const roots = $derived(editor.shown.filter((s) => isRoot(editor.shown, s)));
+  const childrenOf = (id: number) => editor.shown.filter((c) => c.parent === id);
+  const chain = (s: Shape) => [...ancestors(editor.shown, s), s].map(transformOf).join(" ");
 </script>
 
 <div class="stage" class:creating={editor.tool !== "select"}>
@@ -112,9 +129,11 @@
     <text x="0" y="-10" class="ab-name">{ab.name} · {ab.width} × {ab.height}</text>
     <rect width={ab.width} height={ab.height} fill={argbToCss(ab.background)} class="artboard" />
     <g clip-path="url(#artboard-clip)">
-      {#each editor.shown as s (s.id)}
-        <g transform={transform(s)} opacity={s.opacity} data-id={s.id} class="shape">
-          {#if s.kind === "rectangle"}
+      {#snippet node(s: Shape)}
+        <g transform={transform(s)} opacity={s.opacity} data-id={s.kind === "group" ? undefined : s.id} class:shape={s.kind !== "group"}>
+          {#if s.kind === "group"}
+            {#each childrenOf(s.id) as c (c.id)}{@render node(c)}{/each}
+          {:else if s.kind === "rectangle"}
             <rect x={-s.width / 2} y={-s.height / 2} width={s.width} height={s.height}
               rx={Math.min(s.cornerRadius, s.width / 2, s.height / 2)} fill={argbToCss(s.fill)} />
           {:else if s.kind === "ellipse"}
@@ -123,13 +142,19 @@
             <path d={pathData(s)} fill={argbToCss(s.fill)} fill-rule={s.fillRule === "evenOdd" ? "evenodd" : "nonzero"} />
           {/if}
         </g>
-      {/each}
+      {/snippet}
+      {#each roots as s (s.id)}{@render node(s)}{/each}
     </g>
-    {#each editor.shown.filter((s) => s.id === editor.selected) as s (s.id)}
+    {#each editor.shown.filter((s) => s.id === editor.selected && s.kind !== "group") as s (s.id)}
       {@const b = localBounds(s)}
-      <g transform={transform(s)} class="selection">
+      <g transform={chain(s)} class="selection">
         <rect x={b.x} y={b.y} width={b.w} height={b.h} vector-effect="non-scaling-stroke" />
         <circle cx={b.x + b.w} cy={b.y + b.h} r={6 / Math.max(0.05, Math.abs(s.scaleX))} data-handle="resize" vector-effect="non-scaling-stroke" />
+      </g>
+    {/each}
+    {#each editor.shown.filter((s) => s.id === editor.selected && s.kind === "group") as s (s.id)}
+      <g transform={chain(s)} class="selection">
+        <path d="M-10 0H10M0 -10V10" vector-effect="non-scaling-stroke" class="origin" />
       </g>
     {/each}
   </svg>
@@ -146,6 +171,7 @@
   .ab-name { fill: var(--muted); font-size: 12px; }
   .shape { cursor: move; }
   .selection rect { fill: none; stroke: var(--accent); stroke-width: 1.5; pointer-events: none; }
+  .selection .origin { stroke: var(--accent); stroke-width: 2; }
   .selection circle { fill: #fff; stroke: var(--accent); stroke-width: 1.5; cursor: nwse-resize; }
   .badge { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--key); color: #000;
     padding: 2px 10px; border-radius: 99px; font-weight: 600; font-size: 12px; }

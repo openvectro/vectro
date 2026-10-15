@@ -1,6 +1,6 @@
 // Mirrors crates/vectro-doc. The document travels to Rust as JSON.
 
-export type ShapeKind = "rectangle" | "ellipse" | "path";
+export type ShapeKind = "rectangle" | "ellipse" | "path" | "group";
 export interface Vertex { x: number; y: number; inX: number; inY: number; outX: number; outY: number }
 export interface SubPath { closed: boolean; points: Vertex[] }
 export type Prop =
@@ -28,7 +28,32 @@ export interface Shape {
   fill: number; // ARGB
   paths?: SubPath[];
   fillRule?: "nonZero" | "evenOdd";
+  parent?: number;
 }
+
+export const transformOf = (s: Shape) => `translate(${s.x} ${s.y}) rotate(${s.rotation}) scale(${s.scaleX} ${s.scaleY})`;
+
+/** Ancestors of a shape, outermost first. */
+export function ancestors(shapes: Shape[], s: Shape): Shape[] {
+  const out: Shape[] = [];
+  let p = shapes.find((x) => x.id === s.parent && x.kind === "group");
+  while (p && out.length < 64) {
+    out.unshift(p);
+    p = shapes.find((x) => x.id === p!.parent && x.kind === "group");
+  }
+  return out;
+}
+
+/** Matrix from a shape's own space to artboard space. */
+export function worldMatrix(shapes: Shape[], s: Shape, includeSelf = true): DOMMatrix {
+  let m = new DOMMatrix();
+  for (const a of [...ancestors(shapes, s), ...(includeSelf ? [s] : [])]) {
+    m = m.translate(a.x, a.y).rotate(a.rotation).scale(a.scaleX, a.scaleY);
+  }
+  return m;
+}
+
+export const isRoot = (shapes: Shape[], s: Shape) => !shapes.some((x) => x.id === s.parent && x.kind === "group");
 
 /** SVG path data for a path shape, relative to its origin. */
 export function pathData(s: Shape): string {
