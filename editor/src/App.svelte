@@ -9,6 +9,20 @@
 
   let previewOpen = $state(false);
 
+  // ?open=<url of a .vectro.json> loads that project, e.g. from a local file server.
+  $effect(() => {
+    const url = new URLSearchParams(location.search).get("open");
+    if (!url) return;
+    fetch(url)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`${r.status} ${r.statusText}`))))
+      .then((doc) => {
+        if (!doc?.artboard || !Array.isArray(doc.shapes)) throw new Error("not a Vectro project");
+        editor.open(doc);
+        editor.mode = "animate";
+      })
+      .catch((e) => (editor.error = `Could not open ${url}: ${e.message ?? e}`));
+  });
+
   // Autosave every change.
   $effect(() => {
     JSON.stringify(editor.doc);
