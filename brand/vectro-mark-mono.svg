@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <path d="M128 170L236 366C272 300 296 234 334 176" fill="none" stroke="currentColor" stroke-width="60" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M334 176L412 118" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+  <path fill-rule="evenodd" d="M312.0 154.0h44v44h-44z M325.0 167.0h18v18h-18z" fill="currentColor"/>
+  <circle cx="412" cy="118" r="17.5" fill="none" stroke="currentColor" stroke-width="9"/>
+</svg>

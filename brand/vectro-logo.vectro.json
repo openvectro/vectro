@@ -1,0 +1,864 @@
+{
+  "version": 1,
+  "artboard": {
+    "name": "Vectro logo",
+    "width": 512.0,
+    "height": 512.0,
+    "background": 0
+  },
+  "shapes": [
+    {
+      "id": 1,
+      "name": "tile",
+      "kind": "rectangle",
+      "x": 256.0,
+      "y": 256.0,
+      "width": 512.0,
+      "height": 512.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 112.0,
+      "fill": 4283403519,
+      "fillRule": "nonZero",
+      "gradient": {
+        "kind": "linear",
+        "start": [
+          -256.0,
+          -256.0
+        ],
+        "end": [
+          256.0,
+          256.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4286344447
+          },
+          {
+            "position": 0.5,
+            "color": 4283403519
+          },
+          {
+            "position": 1.0,
+            "color": 4280472558
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "name": "V",
+      "kind": "path",
+      "x": 256.0,
+      "y": 256.0,
+      "width": 0.0,
+      "height": 0.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 0,
+      "paths": [
+        {
+          "closed": false,
+          "points": [
+            {
+              "x": -128.0,
+              "y": -86.0,
+              "inX": -128.0,
+              "inY": -86.0,
+              "outX": -128.0,
+              "outY": -86.0
+            },
+            {
+              "x": -20.0,
+              "y": 110.0,
+              "inX": -20.0,
+              "inY": 110.0,
+              "outX": 16.0,
+              "outY": 44.0
+            },
+            {
+              "x": 78.0,
+              "y": -80.0,
+              "inX": 40.0,
+              "inY": -22.0,
+              "outX": 78.0,
+              "outY": -80.0
+            }
+          ]
+        }
+      ],
+      "fillRule": "nonZero",
+      "stroke": {
+        "color": 4294967295,
+        "thickness": 60.0,
+        "cap": 1,
+        "join": 1
+      }
+    },
+    {
+      "id": 3,
+      "name": "handle",
+      "kind": "path",
+      "x": 256.0,
+      "y": 256.0,
+      "width": 0.0,
+      "height": 0.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 0,
+      "paths": [
+        {
+          "closed": false,
+          "points": [
+            {
+              "x": 78.0,
+              "y": -80.0,
+              "inX": 78.0,
+              "inY": -80.0,
+              "outX": 78.0,
+              "outY": -80.0
+            },
+            {
+              "x": 156.0,
+              "y": -138.0,
+              "inX": 156.0,
+              "inY": -138.0,
+              "outX": 156.0,
+              "outY": -138.0
+            }
+          ]
+        }
+      ],
+      "fillRule": "nonZero",
+      "stroke": {
+        "color": 4294967295,
+        "thickness": 9.0,
+        "cap": 1,
+        "join": 1
+      }
+    },
+    {
+      "id": 4,
+      "name": "anchor",
+      "kind": "rectangle",
+      "x": 334.0,
+      "y": 176.0,
+      "width": 44.0,
+      "height": 44.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 6.0,
+      "fill": 4294967295,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 5,
+      "name": "anchor hole",
+      "kind": "rectangle",
+      "x": 334.0,
+      "y": 176.0,
+      "width": 18.0,
+      "height": 18.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 3.0,
+      "fill": 4283403519,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 6,
+      "name": "knob",
+      "kind": "ellipse",
+      "x": 412.0,
+      "y": 118.0,
+      "width": 35.0,
+      "height": 35.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 0,
+      "fillRule": "nonZero",
+      "stroke": {
+        "color": 4294967295,
+        "thickness": 9.0,
+        "cap": 1,
+        "join": 1
+      }
+    }
+  ],
+  "animations": [
+    {
+      "name": "Intro",
+      "fps": 60,
+      "duration": 180,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 1,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 22,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 1,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 22,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 1,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 14,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 15,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "pointX",
+          "point": {
+            "path": 0,
+            "index": 0
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": -20.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 16,
+              "value": -20.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 40,
+              "value": -128.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "pointY",
+          "point": {
+            "path": 0,
+            "index": 0
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": 110.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 16,
+              "value": 110.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 40,
+              "value": -86.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "pointX",
+          "point": {
+            "path": 0,
+            "index": 2
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": -20.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 34,
+              "value": -20.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 66,
+              "value": 78.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "pointY",
+          "point": {
+            "path": 0,
+            "index": 2
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": 110.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 34,
+              "value": 110.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 66,
+              "value": -80.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "outLength",
+          "point": {
+            "path": 0,
+            "index": 1
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 34,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 66,
+              "value": 75.1797866821289,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "outAngle",
+          "point": {
+            "path": 0,
+            "index": 1
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": -61.38954162597656,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "inLength",
+          "point": {
+            "path": 0,
+            "index": 2
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 34,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 66,
+              "value": 69.3397445678711,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 2,
+          "prop": "inAngle",
+          "point": {
+            "path": 0,
+            "index": 2
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": 123.2317123413086,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 60,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 76,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 60,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 76,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 60,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 76,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 60,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 76,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 3,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 69,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 70,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 3,
+          "prop": "pointX",
+          "point": {
+            "path": 0,
+            "index": 1
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": 78.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 70,
+              "value": 78.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 88,
+              "value": 156.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 3,
+          "prop": "pointY",
+          "point": {
+            "path": 0,
+            "index": 1
+          },
+          "keys": [
+            {
+              "frame": 0,
+              "value": -80.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 70,
+              "value": -80.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 88,
+              "value": -138.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 84,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 100,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 84,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 100,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 1,
+          "prop": "rotation",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -6.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 22,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+<p align="center"><img src="brand/vectro-logo.gif" width="160" alt="Vectro"></p>
+
 # Vectro
 
 Free, open-source interactive vector animation: layers, vectors, timelines and state
@@ -62,3 +64,9 @@ cargo test
 - `docs/format.md` what the format holds, confirmed on real files
 
 MIT licence.
+
+## Brand
+
+`brand/` holds the mark and wordmark as SVG, icon and favicon renders, the GitHub banner, and the
+logo animated with Vectro itself (`brand/vectro-logo.vectro.json`, built by `examples/logo.rs`).
+`python3 brand/build.py` regenerates the renders. The wordmark is Inter Tight (OFL, in `brand/fonts`).

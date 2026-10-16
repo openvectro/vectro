@@ -70,7 +70,7 @@
 </script>
 
 <header>
-  <div class="brand">Vectro</div>
+  <div class="brand"><img src="/favicon.svg" alt="" width="22" height="22" />Vectro</div>
   <div class="group">
     {#each tools as t}
       <button class="tool" class:active={editor.tool === t.tool} onclick={() => (editor.tool = t.tool)} title="{t.label} ({t.key})"><span class="glyph">{t.glyph}</span>{t.label}</button>
@@ -111,7 +111,8 @@
 
 <style>
   header { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-  .brand { font-weight: 700; letter-spacing: 0.02em; font-size: 15px; }
+  .brand { font-weight: 700; letter-spacing: 0.02em; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .brand img { border-radius: 5px; }
   .group { display: flex; gap: 4px; }
   .tool { display: flex; gap: 6px; align-items: center; }
   .glyph { font-size: 14px; line-height: 1; opacity: 0.85; }

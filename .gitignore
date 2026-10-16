@@ -3,3 +3,4 @@ target/
 *.riv
 !tests/fixtures/*.riv
 !tests/web/*.riv
+!brand/*.riv
