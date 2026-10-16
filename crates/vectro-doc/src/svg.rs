@@ -420,24 +420,10 @@ fn walk(node: roxmltree::Node, parent: M, fill: Option<u32>, out: &mut Vec<Shape
 
 #[allow(clippy::too_many_arguments)]
 fn basic(kind: ShapeKind, name: &str, x: f64, y: f64, w: f64, h: f64, rot: f64, radius: f64, fill: u32) -> Shape {
-    Shape {
-        id: 0,
-        name: name.into(),
-        kind,
-        x: x as f32,
-        y: y as f32,
-        width: w as f32,
-        height: h as f32,
-        rotation: rot as f32,
-        scale_x: 1.0,
-        scale_y: 1.0,
-        opacity: 1.0,
-        corner_radius: radius as f32,
-        fill,
-        paths: Vec::new(),
-        fill_rule: FillRule::NonZero,
-        parent: None,
-    }
+    let mut s = Shape::new(0, name, kind, x as f32, y as f32, w as f32, h as f32, fill);
+    s.rotation = rot as f32;
+    s.corner_radius = radius as f32;
+    s
 }
 
 /// A path shape whose origin is the centre of its bounds.

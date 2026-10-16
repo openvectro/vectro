@@ -1,107 +1,1105 @@
 {
   "version": 1,
   "artboard": {
-    "name": "Whack a dot",
+    "name": "Whack a mole",
     "width": 640.0,
     "height": 400.0,
-    "background": 4280163876
+    "background": 4279045394
   },
   "shapes": [
     {
       "id": 1,
-      "name": "hole 1",
-      "kind": "ellipse",
-      "x": 160.0,
-      "y": 250.0,
-      "width": 120.0,
-      "height": 44.0,
+      "name": "sky",
+      "kind": "rectangle",
+      "x": 320.0,
+      "y": 200.0,
+      "width": 640.0,
+      "height": 400.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
       "opacity": 1.0,
       "cornerRadius": 0.0,
-      "fill": 4280953395,
-      "fillRule": "nonZero"
+      "fill": 4279505948,
+      "fillRule": "nonZero",
+      "gradient": {
+        "kind": "linear",
+        "start": [
+          0.0,
+          -200.0
+        ],
+        "end": [
+          0.0,
+          200.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4280032295
+          },
+          {
+            "position": 1.0,
+            "color": 4278913808
+          }
+        ]
+      }
     },
     {
       "id": 2,
-      "name": "hole 2",
-      "kind": "ellipse",
+      "name": "ground",
+      "kind": "rectangle",
       "x": 320.0,
-      "y": 250.0,
-      "width": 120.0,
-      "height": 44.0,
+      "y": 340.0,
+      "width": 640.0,
+      "height": 120.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
       "opacity": 1.0,
       "cornerRadius": 0.0,
-      "fill": 4280953395,
-      "fillRule": "nonZero"
+      "fill": 4279703327,
+      "fillRule": "nonZero",
+      "gradient": {
+        "kind": "linear",
+        "start": [
+          0.0,
+          -60.0
+        ],
+        "end": [
+          0.0,
+          60.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4280229674
+          },
+          {
+            "position": 1.0,
+            "color": 4279374361
+          }
+        ]
+      }
     },
     {
       "id": 3,
-      "name": "hole 3",
+      "name": "rim 1",
       "kind": "ellipse",
-      "x": 480.0,
-      "y": 250.0,
-      "width": 120.0,
-      "height": 44.0,
+      "x": 160.0,
+      "y": 278.0,
+      "width": 140.0,
+      "height": 54.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
       "opacity": 1.0,
       "cornerRadius": 0.0,
-      "fill": 4280953395,
+      "fill": 4281019192,
       "fillRule": "nonZero"
     },
     {
       "id": 4,
-      "name": "dot 1",
+      "name": "hole 1",
       "kind": "ellipse",
       "x": 160.0,
-      "y": 250.0,
-      "width": 72.0,
-      "height": 72.0,
+      "y": 276.0,
+      "width": 122.0,
+      "height": 42.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
-      "opacity": 0.0,
+      "opacity": 1.0,
       "cornerRadius": 0.0,
-      "fill": 4294551066,
-      "fillRule": "nonZero"
+      "fill": 4278650634,
+      "fillRule": "nonZero",
+      "feather": {
+        "strength": 10.0,
+        "offset": [
+          0.0,
+          4.0
+        ],
+        "inner": true
+      }
     },
     {
       "id": 5,
-      "name": "dot 2",
+      "name": "rim 2",
       "kind": "ellipse",
       "x": 320.0,
-      "y": 250.0,
-      "width": 72.0,
-      "height": 72.0,
+      "y": 278.0,
+      "width": 140.0,
+      "height": 54.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
-      "opacity": 0.0,
+      "opacity": 1.0,
       "cornerRadius": 0.0,
-      "fill": 4294551066,
+      "fill": 4281019192,
       "fillRule": "nonZero"
     },
     {
       "id": 6,
-      "name": "dot 3",
+      "name": "hole 2",
+      "kind": "ellipse",
+      "x": 320.0,
+      "y": 276.0,
+      "width": 122.0,
+      "height": 42.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4278650634,
+      "fillRule": "nonZero",
+      "feather": {
+        "strength": 10.0,
+        "offset": [
+          0.0,
+          4.0
+        ],
+        "inner": true
+      }
+    },
+    {
+      "id": 7,
+      "name": "rim 3",
       "kind": "ellipse",
       "x": 480.0,
-      "y": 250.0,
-      "width": 72.0,
-      "height": 72.0,
+      "y": 278.0,
+      "width": 140.0,
+      "height": 54.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4281019192,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 8,
+      "name": "hole 3",
+      "kind": "ellipse",
+      "x": 480.0,
+      "y": 276.0,
+      "width": 122.0,
+      "height": 42.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4278650634,
+      "fillRule": "nonZero",
+      "feather": {
+        "strength": 10.0,
+        "offset": [
+          0.0,
+          4.0
+        ],
+        "inner": true
+      }
+    },
+    {
+      "id": 9,
+      "name": "mole 1",
+      "kind": "group",
+      "x": 160.0,
+      "y": 316.0,
+      "width": 0.0,
+      "height": 0.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
       "opacity": 0.0,
       "cornerRadius": 0.0,
-      "fill": 4294551066,
+      "fill": 0,
       "fillRule": "nonZero"
+    },
+    {
+      "id": 10,
+      "name": "shadow",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": 2.0,
+      "width": 96.0,
+      "height": 30.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4278190080,
+      "fillRule": "nonZero",
+      "parent": 9,
+      "feather": {
+        "strength": 14.0,
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "inner": false
+      }
+    },
+    {
+      "id": 11,
+      "name": "body",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -46.0,
+      "width": 84.0,
+      "height": 84.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294941230,
+      "fillRule": "nonZero",
+      "parent": 9,
+      "gradient": {
+        "kind": "radial",
+        "start": [
+          -14.0,
+          -18.0
+        ],
+        "end": [
+          48.0,
+          -18.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4294955898
+          },
+          {
+            "position": 1.0,
+            "color": 4294933018
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "name": "belly",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -30.0,
+      "width": 46.0,
+      "height": 34.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.9,
+      "cornerRadius": 0.0,
+      "fill": 4294960048,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 13,
+      "name": "eye left",
+      "kind": "ellipse",
+      "x": -16.0,
+      "y": -60.0,
+      "width": 15.0,
+      "height": 17.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294967295,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 14,
+      "name": "eye right",
+      "kind": "ellipse",
+      "x": 16.0,
+      "y": -60.0,
+      "width": 15.0,
+      "height": 17.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294967295,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 15,
+      "name": "pupil",
+      "kind": "ellipse",
+      "x": -14.0,
+      "y": -58.0,
+      "width": 7.0,
+      "height": 8.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4279900703,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 16,
+      "name": "pupil",
+      "kind": "ellipse",
+      "x": 18.0,
+      "y": -58.0,
+      "width": 7.0,
+      "height": 8.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4279900703,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 17,
+      "name": "cheek",
+      "kind": "ellipse",
+      "x": -27.0,
+      "y": -44.0,
+      "width": 13.0,
+      "height": 9.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4294929259,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 18,
+      "name": "cheek",
+      "kind": "ellipse",
+      "x": 27.0,
+      "y": -44.0,
+      "width": 13.0,
+      "height": 9.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4294929259,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 19,
+      "name": "mouth",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -40.0,
+      "width": 11.0,
+      "height": 7.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4286197266,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 20,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 21,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 22,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 23,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 24,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 9
+    },
+    {
+      "id": 25,
+      "name": "mole 2",
+      "kind": "group",
+      "x": 320.0,
+      "y": 316.0,
+      "width": 0.0,
+      "height": 0.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 0,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 26,
+      "name": "shadow",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": 2.0,
+      "width": 96.0,
+      "height": 30.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4278190080,
+      "fillRule": "nonZero",
+      "parent": 25,
+      "feather": {
+        "strength": 14.0,
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "inner": false
+      }
+    },
+    {
+      "id": 27,
+      "name": "body",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -46.0,
+      "width": 84.0,
+      "height": 84.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294941230,
+      "fillRule": "nonZero",
+      "parent": 25,
+      "gradient": {
+        "kind": "radial",
+        "start": [
+          -14.0,
+          -18.0
+        ],
+        "end": [
+          48.0,
+          -18.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4294955898
+          },
+          {
+            "position": 1.0,
+            "color": 4294933018
+          }
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "name": "belly",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -30.0,
+      "width": 46.0,
+      "height": 34.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.9,
+      "cornerRadius": 0.0,
+      "fill": 4294960048,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 29,
+      "name": "eye left",
+      "kind": "ellipse",
+      "x": -16.0,
+      "y": -60.0,
+      "width": 15.0,
+      "height": 17.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294967295,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 30,
+      "name": "eye right",
+      "kind": "ellipse",
+      "x": 16.0,
+      "y": -60.0,
+      "width": 15.0,
+      "height": 17.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294967295,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 31,
+      "name": "pupil",
+      "kind": "ellipse",
+      "x": -14.0,
+      "y": -58.0,
+      "width": 7.0,
+      "height": 8.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4279900703,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 32,
+      "name": "pupil",
+      "kind": "ellipse",
+      "x": 18.0,
+      "y": -58.0,
+      "width": 7.0,
+      "height": 8.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4279900703,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 33,
+      "name": "cheek",
+      "kind": "ellipse",
+      "x": -27.0,
+      "y": -44.0,
+      "width": 13.0,
+      "height": 9.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4294929259,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 34,
+      "name": "cheek",
+      "kind": "ellipse",
+      "x": 27.0,
+      "y": -44.0,
+      "width": 13.0,
+      "height": 9.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4294929259,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 35,
+      "name": "mouth",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -40.0,
+      "width": 11.0,
+      "height": 7.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4286197266,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 36,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 37,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 38,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 39,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 40,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 25
+    },
+    {
+      "id": 41,
+      "name": "mole 3",
+      "kind": "group",
+      "x": 480.0,
+      "y": 316.0,
+      "width": 0.0,
+      "height": 0.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 0,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 42,
+      "name": "shadow",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": 2.0,
+      "width": 96.0,
+      "height": 30.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4278190080,
+      "fillRule": "nonZero",
+      "parent": 41,
+      "feather": {
+        "strength": 14.0,
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "inner": false
+      }
+    },
+    {
+      "id": 43,
+      "name": "body",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -46.0,
+      "width": 84.0,
+      "height": 84.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294941230,
+      "fillRule": "nonZero",
+      "parent": 41,
+      "gradient": {
+        "kind": "radial",
+        "start": [
+          -14.0,
+          -18.0
+        ],
+        "end": [
+          48.0,
+          -18.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4294955898
+          },
+          {
+            "position": 1.0,
+            "color": 4294933018
+          }
+        ]
+      }
+    },
+    {
+      "id": 44,
+      "name": "belly",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -30.0,
+      "width": 46.0,
+      "height": 34.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.9,
+      "cornerRadius": 0.0,
+      "fill": 4294960048,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 45,
+      "name": "eye left",
+      "kind": "ellipse",
+      "x": -16.0,
+      "y": -60.0,
+      "width": 15.0,
+      "height": 17.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294967295,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 46,
+      "name": "eye right",
+      "kind": "ellipse",
+      "x": 16.0,
+      "y": -60.0,
+      "width": 15.0,
+      "height": 17.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294967295,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 47,
+      "name": "pupil",
+      "kind": "ellipse",
+      "x": -14.0,
+      "y": -58.0,
+      "width": 7.0,
+      "height": 8.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4279900703,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 48,
+      "name": "pupil",
+      "kind": "ellipse",
+      "x": 18.0,
+      "y": -58.0,
+      "width": 7.0,
+      "height": 8.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4279900703,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 49,
+      "name": "cheek",
+      "kind": "ellipse",
+      "x": -27.0,
+      "y": -44.0,
+      "width": 13.0,
+      "height": 9.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4294929259,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 50,
+      "name": "cheek",
+      "kind": "ellipse",
+      "x": 27.0,
+      "y": -44.0,
+      "width": 13.0,
+      "height": 9.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 0.0,
+      "fill": 4294929259,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 51,
+      "name": "mouth",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -40.0,
+      "width": 11.0,
+      "height": 7.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4286197266,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 52,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 53,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 54,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 55,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 41
+    },
+    {
+      "id": 56,
+      "name": "spark",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": -50.0,
+      "width": 10.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294953015,
+      "fillRule": "nonZero",
+      "parent": 41
     }
   ],
   "animations": [
@@ -112,7 +1110,20 @@
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 4,
+          "shapeId": 9,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 316.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
           "prop": "opacity",
           "keys": [
             {
@@ -125,12 +1136,12 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 9,
           "prop": "scaleX",
           "keys": [
             {
               "frame": 0,
-              "value": 0.2,
+              "value": 0.6,
               "ease": {
                 "type": "hold"
               }
@@ -138,12 +1149,12 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 9,
           "prop": "scaleY",
           "keys": [
             {
               "frame": 0,
-              "value": 0.2,
+              "value": 0.6,
               "ease": {
                 "type": "hold"
               }
@@ -151,12 +1162,246 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 15,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 15,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 16,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 16,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 20,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 20,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 20,
           "prop": "y",
           "keys": [
             {
               "frame": 0,
-              "value": 250.0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 21,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 21,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 21,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 22,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 22,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 22,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 23,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 23,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 23,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 24,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 24,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 24,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
               "ease": {
                 "type": "hold"
               }
@@ -168,11 +1413,11 @@
     {
       "name": "up 1",
       "fps": 60,
-      "duration": 18,
+      "duration": 20,
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 4,
+          "shapeId": 9,
           "prop": "opacity",
           "keys": [
             {
@@ -183,7 +1428,7 @@
               }
             },
             {
-              "frame": 4,
+              "frame": 3,
               "value": 1.0,
               "ease": {
                 "type": "hold"
@@ -192,82 +1437,12 @@
           ]
         },
         {
-          "shapeId": 4,
-          "prop": "scaleX",
-          "keys": [
-            {
-              "frame": 0,
-              "value": 0.2,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.34,
-                "y1": 1.56,
-                "x2": 0.64,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 10,
-              "value": 1.15,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.42,
-                "y1": 0.0,
-                "x2": 0.58,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 18,
-              "value": 1.0,
-              "ease": {
-                "type": "hold"
-              }
-            }
-          ]
-        },
-        {
-          "shapeId": 4,
-          "prop": "scaleY",
-          "keys": [
-            {
-              "frame": 0,
-              "value": 0.2,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.34,
-                "y1": 1.56,
-                "x2": 0.64,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 10,
-              "value": 1.15,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.42,
-                "y1": 0.0,
-                "x2": 0.58,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 18,
-              "value": 1.0,
-              "ease": {
-                "type": "hold"
-              }
-            }
-          ]
-        },
-        {
-          "shapeId": 4,
+          "shapeId": 9,
           "prop": "y",
           "keys": [
             {
               "frame": 0,
-              "value": 250.0,
+              "value": 316.0,
               "ease": {
                 "type": "cubic",
                 "x1": 0.16,
@@ -277,8 +1452,78 @@
               }
             },
             {
-              "frame": 10,
-              "value": 190.0,
+              "frame": 12,
+              "value": 268.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.6,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 12,
+              "value": 1.08,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.6,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 12,
+              "value": 1.08,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 1.0,
               "ease": {
                 "type": "hold"
               }
@@ -290,11 +1535,11 @@
     {
       "name": "hit 1",
       "fps": 60,
-      "duration": 20,
+      "duration": 22,
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 4,
+          "shapeId": 9,
           "prop": "scaleX",
           "keys": [
             {
@@ -310,7 +1555,7 @@
             },
             {
               "frame": 4,
-              "value": 1.5,
+              "value": 1.4,
               "ease": {
                 "type": "cubic",
                 "x1": 0.42,
@@ -320,8 +1565,8 @@
               }
             },
             {
-              "frame": 20,
-              "value": 0.0,
+              "frame": 22,
+              "value": 0.5,
               "ease": {
                 "type": "hold"
               }
@@ -329,7 +1574,7 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 9,
           "prop": "scaleY",
           "keys": [
             {
@@ -355,7 +1600,69 @@
               }
             },
             {
-              "frame": 20,
+              "frame": 22,
+              "value": 0.3,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 268.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 290.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.55,
+                "y1": 0.0,
+                "x2": 1.0,
+                "y2": 0.45
+              }
+            },
+            {
+              "frame": 22,
+              "value": 316.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 22,
               "value": 0.0,
               "ease": {
                 "type": "hold"
@@ -364,7 +1671,103 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 15,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 15,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 16,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 16,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 20,
           "prop": "opacity",
           "keys": [
             {
@@ -391,12 +1794,12 @@
           ]
         },
         {
-          "shapeId": 4,
-          "prop": "y",
+          "shapeId": 20,
+          "prop": "x",
           "keys": [
             {
               "frame": 0,
-              "value": 190.0,
+              "value": 0.0,
               "ease": {
                 "type": "cubic",
                 "x1": 0.16,
@@ -406,8 +1809,332 @@
               }
             },
             {
-              "frame": 4,
-              "value": 215.0,
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 20,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -96.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 21,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 21,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 21,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -96.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 22,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 22,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -58.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 22,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 23,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 23,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 58.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 23,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 24,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 24,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 24,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -118.0,
               "ease": {
                 "type": "hold"
               }
@@ -423,7 +2150,20 @@
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 5,
+          "shapeId": 25,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 316.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 25,
           "prop": "opacity",
           "keys": [
             {
@@ -436,12 +2176,12 @@
           ]
         },
         {
-          "shapeId": 5,
+          "shapeId": 25,
           "prop": "scaleX",
           "keys": [
             {
               "frame": 0,
-              "value": 0.2,
+              "value": 0.6,
               "ease": {
                 "type": "hold"
               }
@@ -449,12 +2189,12 @@
           ]
         },
         {
-          "shapeId": 5,
+          "shapeId": 25,
           "prop": "scaleY",
           "keys": [
             {
               "frame": 0,
-              "value": 0.2,
+              "value": 0.6,
               "ease": {
                 "type": "hold"
               }
@@ -462,12 +2202,246 @@
           ]
         },
         {
-          "shapeId": 5,
+          "shapeId": 31,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 31,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 32,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 32,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 36,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 36,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 36,
           "prop": "y",
           "keys": [
             {
               "frame": 0,
-              "value": 250.0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 37,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 37,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 37,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 38,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 38,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 38,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 39,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 39,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 39,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 40,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 40,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 40,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
               "ease": {
                 "type": "hold"
               }
@@ -479,11 +2453,11 @@
     {
       "name": "up 2",
       "fps": 60,
-      "duration": 18,
+      "duration": 20,
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 5,
+          "shapeId": 25,
           "prop": "opacity",
           "keys": [
             {
@@ -494,7 +2468,7 @@
               }
             },
             {
-              "frame": 4,
+              "frame": 3,
               "value": 1.0,
               "ease": {
                 "type": "hold"
@@ -503,82 +2477,12 @@
           ]
         },
         {
-          "shapeId": 5,
-          "prop": "scaleX",
-          "keys": [
-            {
-              "frame": 0,
-              "value": 0.2,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.34,
-                "y1": 1.56,
-                "x2": 0.64,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 10,
-              "value": 1.15,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.42,
-                "y1": 0.0,
-                "x2": 0.58,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 18,
-              "value": 1.0,
-              "ease": {
-                "type": "hold"
-              }
-            }
-          ]
-        },
-        {
-          "shapeId": 5,
-          "prop": "scaleY",
-          "keys": [
-            {
-              "frame": 0,
-              "value": 0.2,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.34,
-                "y1": 1.56,
-                "x2": 0.64,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 10,
-              "value": 1.15,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.42,
-                "y1": 0.0,
-                "x2": 0.58,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 18,
-              "value": 1.0,
-              "ease": {
-                "type": "hold"
-              }
-            }
-          ]
-        },
-        {
-          "shapeId": 5,
+          "shapeId": 25,
           "prop": "y",
           "keys": [
             {
               "frame": 0,
-              "value": 250.0,
+              "value": 316.0,
               "ease": {
                 "type": "cubic",
                 "x1": 0.16,
@@ -588,8 +2492,78 @@
               }
             },
             {
-              "frame": 10,
-              "value": 190.0,
+              "frame": 12,
+              "value": 268.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 25,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.6,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 12,
+              "value": 1.08,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 25,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.6,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 12,
+              "value": 1.08,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 1.0,
               "ease": {
                 "type": "hold"
               }
@@ -601,11 +2575,11 @@
     {
       "name": "hit 2",
       "fps": 60,
-      "duration": 20,
+      "duration": 22,
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 5,
+          "shapeId": 25,
           "prop": "scaleX",
           "keys": [
             {
@@ -621,7 +2595,7 @@
             },
             {
               "frame": 4,
-              "value": 1.5,
+              "value": 1.4,
               "ease": {
                 "type": "cubic",
                 "x1": 0.42,
@@ -631,8 +2605,8 @@
               }
             },
             {
-              "frame": 20,
-              "value": 0.0,
+              "frame": 22,
+              "value": 0.5,
               "ease": {
                 "type": "hold"
               }
@@ -640,7 +2614,7 @@
           ]
         },
         {
-          "shapeId": 5,
+          "shapeId": 25,
           "prop": "scaleY",
           "keys": [
             {
@@ -666,7 +2640,69 @@
               }
             },
             {
-              "frame": 20,
+              "frame": 22,
+              "value": 0.3,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 25,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 268.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 290.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.55,
+                "y1": 0.0,
+                "x2": 1.0,
+                "y2": 0.45
+              }
+            },
+            {
+              "frame": 22,
+              "value": 316.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 25,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 22,
               "value": 0.0,
               "ease": {
                 "type": "hold"
@@ -675,7 +2711,103 @@
           ]
         },
         {
-          "shapeId": 5,
+          "shapeId": 31,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 31,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 32,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 32,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 36,
           "prop": "opacity",
           "keys": [
             {
@@ -702,12 +2834,12 @@
           ]
         },
         {
-          "shapeId": 5,
-          "prop": "y",
+          "shapeId": 36,
+          "prop": "x",
           "keys": [
             {
               "frame": 0,
-              "value": 190.0,
+              "value": 0.0,
               "ease": {
                 "type": "cubic",
                 "x1": 0.16,
@@ -717,8 +2849,332 @@
               }
             },
             {
-              "frame": 4,
-              "value": 215.0,
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 36,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -96.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 37,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 37,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 37,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -96.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 38,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 38,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -58.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 38,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 39,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 39,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 58.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 39,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 40,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 40,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 40,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -118.0,
               "ease": {
                 "type": "hold"
               }
@@ -734,7 +3190,20 @@
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 6,
+          "shapeId": 41,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 316.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 41,
           "prop": "opacity",
           "keys": [
             {
@@ -747,12 +3216,12 @@
           ]
         },
         {
-          "shapeId": 6,
+          "shapeId": 41,
           "prop": "scaleX",
           "keys": [
             {
               "frame": 0,
-              "value": 0.2,
+              "value": 0.6,
               "ease": {
                 "type": "hold"
               }
@@ -760,12 +3229,12 @@
           ]
         },
         {
-          "shapeId": 6,
+          "shapeId": 41,
           "prop": "scaleY",
           "keys": [
             {
               "frame": 0,
-              "value": 0.2,
+              "value": 0.6,
               "ease": {
                 "type": "hold"
               }
@@ -773,12 +3242,246 @@
           ]
         },
         {
-          "shapeId": 6,
+          "shapeId": 47,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 47,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 48,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 48,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 52,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 52,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 52,
           "prop": "y",
           "keys": [
             {
               "frame": 0,
-              "value": 250.0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 53,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 53,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 53,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 54,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 54,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 54,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 55,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 55,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 55,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 56,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 56,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 56,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
               "ease": {
                 "type": "hold"
               }
@@ -790,11 +3493,11 @@
     {
       "name": "up 3",
       "fps": 60,
-      "duration": 18,
+      "duration": 20,
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 6,
+          "shapeId": 41,
           "prop": "opacity",
           "keys": [
             {
@@ -805,7 +3508,7 @@
               }
             },
             {
-              "frame": 4,
+              "frame": 3,
               "value": 1.0,
               "ease": {
                 "type": "hold"
@@ -814,82 +3517,12 @@
           ]
         },
         {
-          "shapeId": 6,
-          "prop": "scaleX",
-          "keys": [
-            {
-              "frame": 0,
-              "value": 0.2,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.34,
-                "y1": 1.56,
-                "x2": 0.64,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 10,
-              "value": 1.15,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.42,
-                "y1": 0.0,
-                "x2": 0.58,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 18,
-              "value": 1.0,
-              "ease": {
-                "type": "hold"
-              }
-            }
-          ]
-        },
-        {
-          "shapeId": 6,
-          "prop": "scaleY",
-          "keys": [
-            {
-              "frame": 0,
-              "value": 0.2,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.34,
-                "y1": 1.56,
-                "x2": 0.64,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 10,
-              "value": 1.15,
-              "ease": {
-                "type": "cubic",
-                "x1": 0.42,
-                "y1": 0.0,
-                "x2": 0.58,
-                "y2": 1.0
-              }
-            },
-            {
-              "frame": 18,
-              "value": 1.0,
-              "ease": {
-                "type": "hold"
-              }
-            }
-          ]
-        },
-        {
-          "shapeId": 6,
+          "shapeId": 41,
           "prop": "y",
           "keys": [
             {
               "frame": 0,
-              "value": 250.0,
+              "value": 316.0,
               "ease": {
                 "type": "cubic",
                 "x1": 0.16,
@@ -899,8 +3532,78 @@
               }
             },
             {
-              "frame": 10,
-              "value": 190.0,
+              "frame": 12,
+              "value": 268.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 41,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.6,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 12,
+              "value": 1.08,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 41,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.6,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 12,
+              "value": 1.08,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 1.0,
               "ease": {
                 "type": "hold"
               }
@@ -912,11 +3615,11 @@
     {
       "name": "hit 3",
       "fps": 60,
-      "duration": 20,
+      "duration": 22,
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 6,
+          "shapeId": 41,
           "prop": "scaleX",
           "keys": [
             {
@@ -932,7 +3635,7 @@
             },
             {
               "frame": 4,
-              "value": 1.5,
+              "value": 1.4,
               "ease": {
                 "type": "cubic",
                 "x1": 0.42,
@@ -942,8 +3645,8 @@
               }
             },
             {
-              "frame": 20,
-              "value": 0.0,
+              "frame": 22,
+              "value": 0.5,
               "ease": {
                 "type": "hold"
               }
@@ -951,7 +3654,7 @@
           ]
         },
         {
-          "shapeId": 6,
+          "shapeId": 41,
           "prop": "scaleY",
           "keys": [
             {
@@ -977,7 +3680,69 @@
               }
             },
             {
-              "frame": 20,
+              "frame": 22,
+              "value": 0.3,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 41,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 268.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 290.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.55,
+                "y1": 0.0,
+                "x2": 1.0,
+                "y2": 0.45
+              }
+            },
+            {
+              "frame": 22,
+              "value": 316.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 41,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 22,
               "value": 0.0,
               "ease": {
                 "type": "hold"
@@ -986,7 +3751,103 @@
           ]
         },
         {
-          "shapeId": 6,
+          "shapeId": 47,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 47,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 48,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 48,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 3,
+              "value": 1.7,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 52,
           "prop": "opacity",
           "keys": [
             {
@@ -1013,12 +3874,12 @@
           ]
         },
         {
-          "shapeId": 6,
-          "prop": "y",
+          "shapeId": 52,
+          "prop": "x",
           "keys": [
             {
               "frame": 0,
-              "value": 190.0,
+              "value": 0.0,
               "ease": {
                 "type": "cubic",
                 "x1": 0.16,
@@ -1028,8 +3889,332 @@
               }
             },
             {
-              "frame": 4,
-              "value": 215.0,
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 52,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -96.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 53,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 53,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 53,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -96.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 54,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 54,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -58.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 54,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 55,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 55,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 58.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 55,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -46.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 56,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 56,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 56,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": -50.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": -118.0,
               "ease": {
                 "type": "hold"
               }
@@ -1064,7 +4249,7 @@
       ],
       "layers": [
         {
-          "name": "Dot 1",
+          "name": "Mole 1",
           "states": [
             {
               "name": "Entry",
@@ -1161,7 +4346,7 @@
               "from": 4,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 600,
+              "exitAfterMs": 500,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1176,7 +4361,7 @@
               "from": 5,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 1300,
+              "exitAfterMs": 1200,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1191,15 +4376,15 @@
               "from": 6,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 2200,
+              "exitAfterMs": 2100,
               "conditions": [],
               "randomWeight": 1
             },
             {
               "from": 7,
               "to": 3,
-              "durationMs": 150,
-              "exitAfterMs": 1400,
+              "durationMs": 180,
+              "exitAfterMs": 1500,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1220,14 +4405,14 @@
               "from": 8,
               "to": 3,
               "durationMs": 0,
-              "exitAfterMs": 350,
+              "exitAfterMs": 380,
               "conditions": [],
               "randomWeight": 1
             }
           ]
         },
         {
-          "name": "Dot 2",
+          "name": "Mole 2",
           "states": [
             {
               "name": "Entry",
@@ -1324,7 +4509,7 @@
               "from": 4,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 600,
+              "exitAfterMs": 500,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1339,7 +4524,7 @@
               "from": 5,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 1300,
+              "exitAfterMs": 1200,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1354,15 +4539,15 @@
               "from": 6,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 2200,
+              "exitAfterMs": 2100,
               "conditions": [],
               "randomWeight": 1
             },
             {
               "from": 7,
               "to": 3,
-              "durationMs": 150,
-              "exitAfterMs": 1400,
+              "durationMs": 180,
+              "exitAfterMs": 1500,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1383,14 +4568,14 @@
               "from": 8,
               "to": 3,
               "durationMs": 0,
-              "exitAfterMs": 350,
+              "exitAfterMs": 380,
               "conditions": [],
               "randomWeight": 1
             }
           ]
         },
         {
-          "name": "Dot 3",
+          "name": "Mole 3",
           "states": [
             {
               "name": "Entry",
@@ -1487,7 +4672,7 @@
               "from": 4,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 600,
+              "exitAfterMs": 500,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1502,7 +4687,7 @@
               "from": 5,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 1300,
+              "exitAfterMs": 1200,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1517,15 +4702,15 @@
               "from": 6,
               "to": 7,
               "durationMs": 0,
-              "exitAfterMs": 2200,
+              "exitAfterMs": 2100,
               "conditions": [],
               "randomWeight": 1
             },
             {
               "from": 7,
               "to": 3,
-              "durationMs": 150,
-              "exitAfterMs": 1400,
+              "durationMs": 180,
+              "exitAfterMs": 1500,
               "conditions": [],
               "randomWeight": 1
             },
@@ -1546,7 +4731,7 @@
               "from": 8,
               "to": 3,
               "durationMs": 0,
-              "exitAfterMs": 350,
+              "exitAfterMs": 380,
               "conditions": [],
               "randomWeight": 1
             }
@@ -1555,7 +4740,7 @@
       ],
       "listeners": [
         {
-          "target": 4,
+          "target": 11,
           "event": "down",
           "actions": [
             {
@@ -1569,7 +4754,7 @@
           ]
         },
         {
-          "target": 5,
+          "target": 27,
           "event": "down",
           "actions": [
             {
@@ -1583,7 +4768,7 @@
           ]
         },
         {
-          "target": 6,
+          "target": 43,
           "event": "down",
           "actions": [
             {

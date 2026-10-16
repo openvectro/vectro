@@ -129,3 +129,16 @@ either in `tests/web/interactive.html?file=<riv>&sm=<machine>` to drive the inpu
 - **A note on the web runtime.** `@rive-app/canvas` 2.44 prints deprecation warnings for state
   machine inputs, state-change callbacks and event subscriptions, pointing at data binding (view
   models). They all still work; data binding is a later addition to this format reader.
+
+## Paints (2026-10-16)
+
+- **Gradients.** A `Fill` holds a `LinearGradient` (type 22) or `RadialGradient` (17) instead of a
+  `SolidColor`, with `startX/startY/endX/endY` in the shape's own space (for radial, start is the
+  centre and end a point on the rim), then `GradientStop` children (`colorValue`, `position`).
+  Keying a stop's colour uses `GradientStop.colorValue` (key 38), not `SolidColor`'s 37.
+- **Strokes.** `Stroke` (24) under the shape with `thickness`, `cap` (0 butt, 1 round, 2 square)
+  and `join` (0 miter, 1 round, 2 bevel), then its own `SolidColor`.
+- **Feather.** `Feather` (533) under a `Fill`: `strength`, `offsetX/Y`, `inner`. It is Rive's blur:
+  a feathered copy behind a shape is a glow or drop shadow, `inner` gives an inset shadow.
+  **Rendered by `@rive-app/canvas` 2.44 and the native runtimes; ignored by `@rive-app/webgl2`
+  2.44** (the file loads, the shadows are simply absent). Vectro's editor shows it as a CSS blur.

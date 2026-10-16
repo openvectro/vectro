@@ -3,73 +3,291 @@
   "artboard": {
     "name": "Loading bar",
     "width": 640.0,
-    "height": 200.0,
-    "background": 4280163876
+    "height": 220.0,
+    "background": 4279045394
   },
   "shapes": [
     {
       "id": 1,
-      "name": "track",
+      "name": "card shadow",
       "kind": "rectangle",
       "x": 320.0,
-      "y": 100.0,
-      "width": 520.0,
-      "height": 28.0,
+      "y": 118.0,
+      "width": 560.0,
+      "height": 124.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
-      "opacity": 1.0,
-      "cornerRadius": 14.0,
-      "fill": 4280953395,
-      "fillRule": "nonZero"
+      "opacity": 0.6,
+      "cornerRadius": 26.0,
+      "fill": 4278190080,
+      "fillRule": "nonZero",
+      "feather": {
+        "strength": 30.0,
+        "offset": [
+          0.0,
+          14.0
+        ],
+        "inner": false
+      }
     },
     {
       "id": 2,
-      "name": "bar",
+      "name": "card",
       "kind": "rectangle",
-      "x": 61.0,
-      "y": 100.0,
-      "width": 2.0,
-      "height": 28.0,
+      "x": 320.0,
+      "y": 110.0,
+      "width": 560.0,
+      "height": 124.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
       "opacity": 1.0,
-      "cornerRadius": 14.0,
-      "fill": 4294551066,
-      "fillRule": "nonZero"
+      "cornerRadius": 26.0,
+      "fill": 4280032292,
+      "fillRule": "nonZero",
+      "gradient": {
+        "kind": "linear",
+        "start": [
+          0.0,
+          -62.0
+        ],
+        "end": [
+          0.0,
+          62.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4280624431
+          },
+          {
+            "position": 1.0,
+            "color": 4279571739
+          }
+        ]
+      },
+      "stroke": {
+        "color": 4281479743,
+        "thickness": 1.5,
+        "cap": 1,
+        "join": 1
+      }
     },
     {
       "id": 3,
-      "name": "shimmer",
-      "kind": "ellipse",
-      "x": 60.0,
-      "y": 100.0,
-      "width": 60.0,
-      "height": 28.0,
+      "name": "track",
+      "kind": "rectangle",
+      "x": 320.0,
+      "y": 118.0,
+      "width": 480.0,
+      "height": 18.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
-      "opacity": 0.0,
-      "cornerRadius": 0.0,
+      "opacity": 1.0,
+      "cornerRadius": 9.0,
+      "fill": 4278848015,
+      "fillRule": "nonZero",
+      "feather": {
+        "strength": 8.0,
+        "offset": [
+          0.0,
+          3.0
+        ],
+        "inner": true
+      }
+    },
+    {
+      "id": 4,
+      "name": "glow",
+      "kind": "rectangle",
+      "x": 82.0,
+      "y": 120.0,
+      "width": 4.0,
+      "height": 30.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.55,
+      "cornerRadius": 15.0,
+      "fill": 4294937088,
+      "fillRule": "nonZero",
+      "feather": {
+        "strength": 22.0,
+        "offset": [
+          0.0,
+          6.0
+        ],
+        "inner": false
+      }
+    },
+    {
+      "id": 5,
+      "name": "bar",
+      "kind": "rectangle",
+      "x": 82.0,
+      "y": 118.0,
+      "width": 4.0,
+      "height": 18.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 9.0,
+      "fill": 4294937088,
+      "fillRule": "nonZero",
+      "gradient": {
+        "kind": "linear",
+        "start": [
+          -240.0,
+          0.0
+        ],
+        "end": [
+          240.0,
+          0.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4294937088
+          },
+          {
+            "position": 1.0,
+            "color": 4294953015
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "name": "gloss",
+      "kind": "rectangle",
+      "x": 82.0,
+      "y": 113.0,
+      "width": 1.0,
+      "height": 5.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.22,
+      "cornerRadius": 2.5,
       "fill": 4294967295,
       "fillRule": "nonZero"
     },
     {
-      "id": 4,
-      "name": "tick",
+      "id": 7,
+      "name": "tick glow",
       "kind": "ellipse",
-      "x": 600.0,
-      "y": 100.0,
-      "width": 24.0,
-      "height": 24.0,
+      "x": 586.0,
+      "y": 118.0,
+      "width": 40.0,
+      "height": 40.0,
       "rotation": 0.0,
       "scaleX": 1.0,
       "scaleY": 1.0,
       "opacity": 0.0,
       "cornerRadius": 0.0,
-      "fill": 4283551590,
-      "fillRule": "nonZero"
+      "fill": 4281652121,
+      "fillRule": "nonZero",
+      "feather": {
+        "strength": 16.0,
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "inner": false
+      }
+    },
+    {
+      "id": 8,
+      "name": "tick",
+      "kind": "ellipse",
+      "x": 586.0,
+      "y": 118.0,
+      "width": 30.0,
+      "height": 30.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4281652121,
+      "fillRule": "nonZero",
+      "gradient": {
+        "kind": "radial",
+        "start": [
+          -5.0,
+          -6.0
+        ],
+        "end": [
+          15.0,
+          -6.0
+        ],
+        "stops": [
+          {
+            "position": 0.0,
+            "color": 4285458359
+          },
+          {
+            "position": 1.0,
+            "color": 4279286145
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "name": "check",
+      "kind": "path",
+      "x": 586.0,
+      "y": 118.0,
+      "width": 14.0,
+      "height": 10.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 0,
+      "paths": [
+        {
+          "closed": false,
+          "points": [
+            {
+              "x": -6.0,
+              "y": 0.5,
+              "inX": -6.0,
+              "inY": 0.5,
+              "outX": -6.0,
+              "outY": 0.5
+            },
+            {
+              "x": -1.5,
+              "y": 5.0,
+              "inX": -1.5,
+              "inY": 5.0,
+              "outX": -1.5,
+              "outY": 5.0
+            },
+            {
+              "x": 7.0,
+              "y": -5.0,
+              "inX": 7.0,
+              "inY": -5.0,
+              "outX": 7.0,
+              "outY": -5.0
+            }
+          ]
+        }
+      ],
+      "fillRule": "nonZero",
+      "stroke": {
+        "color": 4294967295,
+        "thickness": 3.2,
+        "cap": 1,
+        "join": 1
+      }
     }
   ],
   "animations": [
@@ -80,12 +298,12 @@
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 2,
+          "shapeId": 5,
           "prop": "width",
           "keys": [
             {
               "frame": 0,
-              "value": 2.0,
+              "value": 4.0,
               "ease": {
                 "type": "hold"
               }
@@ -93,12 +311,12 @@
           ]
         },
         {
-          "shapeId": 2,
+          "shapeId": 5,
           "prop": "x",
           "keys": [
             {
               "frame": 0,
-              "value": 61.0,
+              "value": 82.0,
               "ease": {
                 "type": "hold"
               }
@@ -106,12 +324,64 @@
           ]
         },
         {
-          "shapeId": 2,
+          "shapeId": 4,
+          "prop": "width",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 4.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 82.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "width",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 82.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
           "prop": "fill",
           "keys": [
             {
               "frame": 0,
-              "value": 4294551066.0,
+              "value": 4294937088.0,
               "ease": {
                 "type": "hold"
               }
@@ -119,7 +389,33 @@
           ]
         },
         {
-          "shapeId": 2,
+          "shapeId": 5,
+          "prop": "fillEnd",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 4294953015.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "fill",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 4294937088.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
           "prop": "scaleY",
           "keys": [
             {
@@ -132,8 +428,112 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 7,
           "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 7,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 7,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "scaleY",
           "keys": [
             {
               "frame": 0,
@@ -153,12 +553,12 @@
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 2,
+          "shapeId": 5,
           "prop": "width",
           "keys": [
             {
               "frame": 0,
-              "value": 520.0,
+              "value": 480.0,
               "ease": {
                 "type": "hold"
               }
@@ -166,7 +566,7 @@
           ]
         },
         {
-          "shapeId": 2,
+          "shapeId": 5,
           "prop": "x",
           "keys": [
             {
@@ -179,12 +579,12 @@
           ]
         },
         {
-          "shapeId": 2,
-          "prop": "fill",
+          "shapeId": 4,
+          "prop": "width",
           "keys": [
             {
               "frame": 0,
-              "value": 4294551066.0,
+              "value": 480.0,
               "ease": {
                 "type": "hold"
               }
@@ -192,7 +592,85 @@
           ]
         },
         {
-          "shapeId": 2,
+          "shapeId": 4,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 320.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "width",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 472.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "x",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 320.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "fill",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 4294937088.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "fillEnd",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 4294953015.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "fill",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 4294937088.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
           "prop": "scaleY",
           "keys": [
             {
@@ -205,8 +683,112 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 7,
           "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 7,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 7,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "scaleY",
           "keys": [
             {
               "frame": 0,
@@ -226,12 +808,25 @@
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 3,
+          "shapeId": 4,
           "prop": "opacity",
           "keys": [
             {
               "frame": 0,
-              "value": 0.0,
+              "value": 0.55,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.22,
               "ease": {
                 "type": "hold"
               }
@@ -241,18 +836,18 @@
       ]
     },
     {
-      "name": "glow",
+      "name": "hot",
       "fps": 60,
-      "duration": 72,
-      "loop": "loop",
+      "duration": 1,
+      "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 3,
+          "shapeId": 4,
           "prop": "opacity",
           "keys": [
             {
               "frame": 0,
-              "value": 0.35,
+              "value": 0.95,
               "ease": {
                 "type": "hold"
               }
@@ -260,19 +855,12 @@
           ]
         },
         {
-          "shapeId": 3,
-          "prop": "x",
+          "shapeId": 6,
+          "prop": "opacity",
           "keys": [
             {
               "frame": 0,
-              "value": 60.0,
-              "ease": {
-                "type": "linear"
-              }
-            },
-            {
-              "frame": 72,
-              "value": 580.0,
+              "value": 0.42,
               "ease": {
                 "type": "hold"
               }
@@ -288,12 +876,12 @@
       "loop": "oneShot",
       "tracks": [
         {
-          "shapeId": 2,
+          "shapeId": 5,
           "prop": "fill",
           "keys": [
             {
               "frame": 0,
-              "value": 4294551066.0,
+              "value": 4294937088.0,
               "ease": {
                 "type": "cubic",
                 "x1": 0.42,
@@ -304,7 +892,7 @@
             },
             {
               "frame": 12,
-              "value": 4283551590.0,
+              "value": 4281652121.0,
               "ease": {
                 "type": "hold"
               }
@@ -312,7 +900,55 @@
           ]
         },
         {
-          "shapeId": 2,
+          "shapeId": 5,
+          "prop": "fillEnd",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 4294953015.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 12,
+              "value": 4289197008.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "fill",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 4294937088.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 12,
+              "value": 4281652121.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
           "prop": "scaleY",
           "keys": [
             {
@@ -328,7 +964,7 @@
             },
             {
               "frame": 8,
-              "value": 1.22,
+              "value": 1.28,
               "ease": {
                 "type": "cubic",
                 "x1": 0.42,
@@ -338,7 +974,7 @@
               }
             },
             {
-              "frame": 24,
+              "frame": 26,
               "value": 1.0,
               "ease": {
                 "type": "hold"
@@ -347,7 +983,7 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 7,
           "prop": "opacity",
           "keys": [
             {
@@ -358,8 +994,15 @@
               }
             },
             {
-              "frame": 6,
-              "value": 1.0,
+              "frame": 5,
+              "value": 0.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 9,
+              "value": 0.7,
               "ease": {
                 "type": "hold"
               }
@@ -367,7 +1010,7 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 7,
           "prop": "scaleX",
           "keys": [
             {
@@ -378,7 +1021,7 @@
               }
             },
             {
-              "frame": 6,
+              "frame": 5,
               "value": 0.0,
               "ease": {
                 "type": "cubic",
@@ -389,7 +1032,7 @@
               }
             },
             {
-              "frame": 16,
+              "frame": 17,
               "value": 1.3,
               "ease": {
                 "type": "cubic",
@@ -400,7 +1043,7 @@
               }
             },
             {
-              "frame": 28,
+              "frame": 30,
               "value": 1.0,
               "ease": {
                 "type": "hold"
@@ -409,7 +1052,7 @@
           ]
         },
         {
-          "shapeId": 4,
+          "shapeId": 7,
           "prop": "scaleY",
           "keys": [
             {
@@ -420,7 +1063,7 @@
               }
             },
             {
-              "frame": 6,
+              "frame": 5,
               "value": 0.0,
               "ease": {
                 "type": "cubic",
@@ -431,7 +1074,7 @@
               }
             },
             {
-              "frame": 16,
+              "frame": 17,
               "value": 1.3,
               "ease": {
                 "type": "cubic",
@@ -442,7 +1085,229 @@
               }
             },
             {
-              "frame": 28,
+              "frame": 30,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 5,
+              "value": 0.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 9,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 5,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 17,
+              "value": 1.3,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 30,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 8,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 5,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 17,
+              "value": 1.3,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 30,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 5,
+              "value": 0.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 9,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 5,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 17,
+              "value": 1.3,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 30,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 9,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 5,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 17,
+              "value": 1.3,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 30,
               "value": 1.0,
               "ease": {
                 "type": "hold"
@@ -553,8 +1418,8 @@
             {
               "from": 4,
               "to": 3,
-              "durationMs": 200,
-              "exitAfterMs": 1000,
+              "durationMs": 250,
+              "exitAfterMs": 1100,
               "conditions": [],
               "randomWeight": 1
             }
@@ -594,7 +1459,7 @@
               "random": false
             },
             {
-              "name": "Glow",
+              "name": "Hot",
               "kind": {
                 "type": "animation",
                 "animation": 3,
@@ -614,7 +1479,7 @@
             {
               "from": 3,
               "to": 4,
-              "durationMs": 150,
+              "durationMs": 180,
               "conditions": [
                 {
                   "input": 1,
@@ -627,7 +1492,7 @@
             {
               "from": 4,
               "to": 3,
-              "durationMs": 250,
+              "durationMs": 300,
               "conditions": [
                 {
                   "input": 1,
@@ -642,7 +1507,7 @@
       ],
       "listeners": [
         {
-          "target": 1,
+          "target": 2,
           "event": "enter",
           "actions": [
             {
@@ -653,7 +1518,7 @@
           ]
         },
         {
-          "target": 1,
+          "target": 2,
           "event": "exit",
           "actions": [
             {
@@ -664,7 +1529,7 @@
           ]
         },
         {
-          "target": 1,
+          "target": 2,
           "event": "click",
           "actions": [
             {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { editor } from "../lib/editor.svelte";
-  import { ancestors, argbToCss, isRoot, localBounds, pathData, transformOf, worldMatrix, type Shape } from "../lib/types";
+  import { ancestors, argbToCss, featherStyle, isRoot, localBounds, paintOf, pathData, strokeAttrs, transformOf, worldMatrix, type Shape } from "../lib/types";
 
   let svg: SVGSVGElement;
   const pad = 60;
@@ -130,16 +130,30 @@
     <rect width={ab.width} height={ab.height} fill={argbToCss(ab.background)} class="artboard" />
     <g clip-path="url(#artboard-clip)">
       {#snippet node(s: Shape)}
-        <g transform={transform(s)} opacity={s.opacity} data-id={s.kind === "group" ? undefined : s.id} class:shape={s.kind !== "group"}>
+        <g transform={transform(s)} opacity={s.opacity} data-id={s.kind === "group" ? undefined : s.id} class:shape={s.kind !== "group"} style={featherStyle(s)}>
+          {#if s.gradient}
+            <defs>
+              {#if s.gradient.kind === "linear"}
+                <linearGradient id="grad-{s.id}" gradientUnits="userSpaceOnUse" x1={s.gradient.start[0]} y1={s.gradient.start[1]} x2={s.gradient.end[0]} y2={s.gradient.end[1]}>
+                  {#each s.gradient.stops as st}<stop offset={st.position} stop-color={argbToCss(st.color)} />{/each}
+                </linearGradient>
+              {:else}
+                <radialGradient id="grad-{s.id}" gradientUnits="userSpaceOnUse" cx={s.gradient.start[0]} cy={s.gradient.start[1]} fx={s.gradient.start[0]} fy={s.gradient.start[1]}
+                  r={Math.hypot(s.gradient.end[0] - s.gradient.start[0], s.gradient.end[1] - s.gradient.start[1])}>
+                  {#each s.gradient.stops as st}<stop offset={st.position} stop-color={argbToCss(st.color)} />{/each}
+                </radialGradient>
+              {/if}
+            </defs>
+          {/if}
           {#if s.kind === "group"}
             {#each childrenOf(s.id) as c (c.id)}{@render node(c)}{/each}
           {:else if s.kind === "rectangle"}
             <rect x={-s.width / 2} y={-s.height / 2} width={s.width} height={s.height}
-              rx={Math.min(s.cornerRadius, s.width / 2, s.height / 2)} fill={argbToCss(s.fill)} />
+              rx={Math.min(s.cornerRadius, s.width / 2, s.height / 2)} fill={paintOf(s)} {...strokeAttrs(s)} />
           {:else if s.kind === "ellipse"}
-            <ellipse rx={s.width / 2} ry={s.height / 2} fill={argbToCss(s.fill)} />
+            <ellipse rx={s.width / 2} ry={s.height / 2} fill={paintOf(s)} {...strokeAttrs(s)} />
           {:else}
-            <path d={pathData(s)} fill={argbToCss(s.fill)} fill-rule={s.fillRule === "evenOdd" ? "evenodd" : "nonzero"} />
+            <path d={pathData(s)} fill={paintOf(s)} fill-rule={s.fillRule === "evenOdd" ? "evenodd" : "nonzero"} {...strokeAttrs(s)} />
           {/if}
         </g>
       {/snippet}

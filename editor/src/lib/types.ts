@@ -7,7 +7,9 @@ export type ShapeProp =
   | "x" | "y" | "width" | "height" | "rotation"
   | "scaleX" | "scaleY" | "opacity" | "cornerRadius" | "fill";
 export type PointProp = "pointX" | "pointY" | "inAngle" | "inLength" | "outAngle" | "outLength";
-export type Prop = ShapeProp | PointProp;
+/** The last stop of a gradient fill; "fill" is the first stop or the flat colour. */
+export type PaintProp = "fillEnd";
+export type Prop = ShapeProp | PointProp | PaintProp;
 export type Ease =
   | { type: "hold" }
   | { type: "linear" }
@@ -31,7 +33,18 @@ export interface Shape {
   paths?: SubPath[];
   fillRule?: "nonZero" | "evenOdd";
   parent?: number;
+  gradient?: { kind: "linear" | "radial"; start: [number, number]; end: [number, number]; stops: { position: number; color: number }[] };
+  stroke?: { color: number; thickness: number; cap?: number; join?: number };
+  feather?: { strength: number; offset?: [number, number]; inner?: boolean };
 }
+
+/** SVG paint for a shape: a gradient reference or the flat colour. */
+export const paintOf = (s: Shape) => (s.gradient ? `url(#grad-${s.id})` : argbToCss(s.fill));
+/** A soft blur that stands in for Rive's feather (drawn properly by the runtime). */
+export const featherStyle = (s: Shape) => (s.feather && !s.feather.inner ? `filter: blur(${(s.feather.strength / 2).toFixed(1)}px)` : "");
+const CAPS = ["butt", "round", "square"] as const, JOINS = ["miter", "round", "bevel"] as const;
+export const strokeAttrs = (s: Shape) =>
+  s.stroke ? { stroke: argbToCss(s.stroke.color), "stroke-width": s.stroke.thickness, "stroke-linecap": CAPS[s.stroke.cap ?? 0], "stroke-linejoin": JOINS[s.stroke.join ?? 0] } : {};
 
 export const transformOf = (s: Shape) => `translate(${s.x} ${s.y}) rotate(${s.rotation}) scale(${s.scaleX} ${s.scaleY})`;
 

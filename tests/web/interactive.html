@@ -1,68 +1,148 @@
 <!doctype html>
+<html lang="en">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vectro interactive test</title>
 <style>
-  body { margin: 0; background: #111; color: #ddd; font: 14px system-ui; display: grid; grid-template-columns: 640px 1fr; gap: 16px; padding: 16px; }
-  canvas { display: block; background: #16161a; }
-  label { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
-  pre { font-size: 12px; max-height: 300px; overflow: auto; background: #000; padding: 8px; }
+  :root { --bg: #0b0b0f; --panel: #15151b; --line: #26262f; --text: #ececf1; --muted: #8a8a98; --accent: #f9a61a; --green: #34d399; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: radial-gradient(1200px 600px at 50% -10%, #1a1a26, var(--bg) 60%); color: var(--text);
+    font: 14px/1.45 Inter, system-ui, -apple-system, sans-serif; display: grid; place-items: start center; padding: 28px 16px; }
+  .wrap { width: min(1080px, 100%); }
+  header { display: flex; align-items: baseline; gap: 12px; margin: 0 4px 14px; }
+  header strong { font-size: 18px; letter-spacing: 0.01em; }
+  header span { color: var(--muted); font-size: 13px; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .stage { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px; box-shadow: 0 30px 60px -30px #000; }
+  canvas { display: block; width: 100%; height: auto; border-radius: 12px; background: #0d0d12; }
+  .side { display: grid; gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .card h2 { margin: 0 0 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); }
+  .row:first-of-type { border-top: 0; }
+  .row label { color: var(--text); font-weight: 500; }
+  input[type="range"] { width: 150px; accent-color: var(--accent); }
+  .switch { position: relative; width: 40px; height: 22px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch i { position: absolute; inset: 0; background: #2a2a35; border-radius: 99px; transition: 0.2s; cursor: pointer; }
+  .switch i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: 0.2s; }
+  .switch input:checked + i { background: var(--accent); }
+  .switch input:checked + i::after { transform: translateX(18px); }
+  button.fire { background: var(--accent); color: #1a1000; border: 0; border-radius: 99px; padding: 6px 14px; font-weight: 600; cursor: pointer; }
+  button.fire:active { transform: scale(0.96); }
+  .big { font-size: 44px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; margin: 2px 0 6px; }
+  .big small { font-size: 13px; color: var(--muted); font-weight: 500; margin-left: 8px; letter-spacing: 0; }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { background: #1f1f28; border: 1px solid var(--line); border-radius: 99px; padding: 2px 10px; font-size: 12px; color: var(--muted); }
+  .pill.now { color: var(--text); border-color: #3a3a48; }
+  .log { font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); max-height: 180px; overflow: auto; margin: 0; }
+  .error { color: #ff6b6b; }
 </style>
-<div>
-  <canvas id="c" width="640" height="400"></canvas>
-  <div id="inputs"></div>
+<div class="wrap">
+  <header><strong>Vectro</strong><span id="title">interactive test</span></header>
+  <main>
+    <div class="stage"><canvas id="c" width="640" height="400"></canvas></div>
+    <div class="side">
+      <div class="card"><h2>Inputs</h2><div id="inputs"><span class="pill">loading…</span></div></div>
+      <div class="card"><h2>Events</h2><div class="big"><span id="count">0</span><small id="count-label">received</small></div><div class="pills" id="events"></div></div>
+      <div class="card"><h2>State changes</h2><pre class="log" id="states"></pre></div>
+    </div>
+  </main>
 </div>
-<div>
-  <div>State changes</div><pre id="states"></pre>
-  <div>Events</div><pre id="events"></pre>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/@rive-app/canvas@2.44.0/rive.js"></script>
 <script>
-// Loads ?file=<riv>&sm=<state machine> and gives every input a control; logs states and events.
+// ?file=<riv>&sm=<state machine>[&renderer=webgl2]: every input gets a control; states and events are logged.
 const params = new URLSearchParams(location.search);
-const sm = params.get("sm");
+const runtime = params.get("renderer") === "webgl2" ? "webgl2" : "canvas";
+const tag = document.createElement("script");
+tag.src = `https://cdn.jsdelivr.net/npm/@rive-app/${runtime}@2.44.0/rive.js`;
+tag.onload = start;
+document.head.appendChild(tag);
 window.report = { loaded: false, error: null, states: [], events: [] };
-const log = (id, m) => (document.getElementById(id).textContent += m + "\n");
-rive.Rive.suppressDeprecationWarnings = ["state-change-events", "state-machines-param", "rive-events", "state-machine-inputs"];
-const canvas = document.getElementById("c");
-const r = new rive.Rive({
-  src: params.get("file") + "?v=" + Date.now(),
-  canvas,
-  stateMachines: sm,
-  autoplay: true,
-  onLoad: () => {
-    report.loaded = true;
-    // Size the canvas to the artboard so canvas pixels are artboard units.
-    const b = r.bounds;
-    canvas.width = b.maxX - b.minX;
-    canvas.height = b.maxY - b.minY;
-    canvas.style.width = canvas.width + "px";
-    canvas.style.height = canvas.height + "px";
-    r.resizeDrawingSurfaceToCanvas();
-    const box = document.getElementById("inputs");
-    for (const input of r.stateMachineInputs(sm)) {
-      const label = document.createElement("label");
-      label.textContent = input.name + " ";
-      let el;
-      if (input.type === rive.StateMachineInputType.Boolean) {
-        el = Object.assign(document.createElement("input"), { type: "checkbox", checked: input.value });
-        el.onchange = () => (input.value = el.checked);
-      } else if (input.type === rive.StateMachineInputType.Number) {
-        el = Object.assign(document.createElement("input"), { type: "range", min: 0, max: 100, step: 1, value: input.value });
-        el.oninput = () => (input.value = Number(el.value));
-      } else {
-        el = Object.assign(document.createElement("button"), { textContent: "fire" });
-        el.onclick = () => input.fire();
+
+function start() {
+  const sm = params.get("sm");
+  const file = params.get("file");
+  document.getElementById("title").textContent = `${file} · ${sm} · ${runtime}`;
+  rive.Rive.suppressDeprecationWarnings = ["state-change-events", "state-machines-param", "rive-events", "state-machine-inputs"];
+  const canvas = document.getElementById("c");
+  const counts = {};
+  const r = new rive.Rive({
+    src: file + "?v=" + Date.now(),
+    canvas,
+    stateMachines: sm,
+    autoplay: true,
+    onLoad: () => {
+      report.loaded = true;
+      const b = r.bounds;
+      canvas.width = b.maxX - b.minX;
+      canvas.height = b.maxY - b.minY;
+      canvas.style.aspectRatio = `${canvas.width} / ${canvas.height}`;
+      r.resizeDrawingSurfaceToCanvas();
+      const box = document.getElementById("inputs");
+      box.innerHTML = "";
+      for (const input of r.stateMachineInputs(sm)) {
+        const row = document.createElement("div");
+        row.className = "row";
+        const label = document.createElement("label");
+        label.textContent = input.name;
+        row.appendChild(label);
+        let el;
+        if (input.type === rive.StateMachineInputType.Boolean) {
+          const wrap = document.createElement("label");
+          wrap.className = "switch";
+          el = Object.assign(document.createElement("input"), { type: "checkbox", checked: input.value });
+          el.onchange = () => (input.value = el.checked);
+          wrap.append(el, document.createElement("i"));
+          row.appendChild(wrap);
+        } else if (input.type === rive.StateMachineInputType.Number) {
+          el = Object.assign(document.createElement("input"), { type: "range", min: 0, max: 100, step: 1, value: input.value });
+          el.oninput = () => (input.value = Number(el.value));
+          row.appendChild(el);
+        } else {
+          el = Object.assign(document.createElement("button"), { textContent: "Fire", className: "fire" });
+          el.onclick = () => input.fire();
+          row.appendChild(el);
+        }
+        el.dataset.input = input.name;
+        box.appendChild(row);
       }
-      el.dataset.input = input.name;
-      label.appendChild(el);
-      box.appendChild(label);
-    }
-  },
-  onLoadError: (e) => { report.error = String(e && (e.data || e.message || e)); log("states", "error " + report.error); },
-  onStateChange: (e) => { report.states.push(...e.data); log("states", e.data.join(", ")); },
-});
-r.on(rive.EventType.RiveEvent, (e) => { report.events.push(e.data.name); log("events", e.data.name); });
-window.rive_instance = r;
-window.setInput = (name, value) => { const i = r.stateMachineInputs(sm).find((x) => x.name === name); if (value === "fire") i.fire(); else i.value = value; };
-window.pixel = (x, y) => { const g = document.createElement("canvas"); g.width = canvas.width; g.height = canvas.height; const ctx = g.getContext("2d"); ctx.drawImage(canvas, 0, 0); const p = ctx.getImageData(x, y, 1, 1).data; return [p[0], p[1], p[2]]; };
+    },
+    onLoadError: (e) => {
+      report.error = String(e && (e.data || e.message || e));
+      document.getElementById("inputs").innerHTML = `<span class="error">${report.error}</span>`;
+    },
+    onStateChange: (e) => {
+      report.states.push(...e.data);
+      const log = document.getElementById("states");
+      log.textContent += e.data.join(", ") + "\n";
+      log.scrollTop = log.scrollHeight;
+    },
+  });
+  r.on(rive.EventType.RiveEvent, (e) => {
+    const name = e.data.name;
+    report.events.push(name);
+    counts[name] = (counts[name] || 0) + 1;
+    document.getElementById("count").textContent = report.events.length;
+    document.getElementById("count-label").textContent = Object.entries(counts).map(([k, v]) => `${k} × ${v}`).join(" · ");
+    const pills = document.getElementById("events");
+    for (const p of pills.children) p.classList.remove("now");
+    const pill = document.createElement("span");
+    pill.className = "pill now";
+    pill.textContent = name;
+    pills.prepend(pill);
+    while (pills.children.length > 8) pills.lastChild.remove();
+  });
+  window.rive_instance = r;
+  window.setInput = (name, value) => { const i = r.stateMachineInputs(sm).find((x) => x.name === name); if (value === "fire") i.fire(); else i.value = value; };
+  // Reads the pixel at artboard coordinates, whatever size the canvas is drawn at.
+  window.pixel = (x, y) => {
+    const b = r.bounds;
+    const k = canvas.width / (b.maxX - b.minX);
+    const g = document.createElement("canvas"); g.width = canvas.width; g.height = canvas.height;
+    const ctx = g.getContext("2d"); ctx.drawImage(canvas, 0, 0);
+    const p = ctx.getImageData(Math.round(x * k), Math.round(y * k), 1, 1).data; return [p[0], p[1], p[2]];
+  };
+}
 </script>
+</html>

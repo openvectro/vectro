@@ -302,6 +302,73 @@ pub struct Shape {
     /// The group this shape sits in; its x/y are then in the group's space.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent: Option<u32>,
+    /// Replaces the flat `fill` when set. Coordinates are in the shape's own space.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gradient: Option<Gradient>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stroke: Option<Stroke>,
+    /// Rive's feather: softens the fill into a glow or shadow.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feather: Option<Feather>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum GradientKind {
+    Linear,
+    Radial,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Stop {
+    pub position: f32,
+    /// ARGB
+    pub color: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Gradient {
+    pub kind: GradientKind,
+    pub start: (f32, f32),
+    /// For a radial gradient, a point on the outer circle.
+    pub end: (f32, f32),
+    pub stops: Vec<Stop>,
+}
+
+impl Gradient {
+    pub fn linear(x0: f32, y0: f32, x1: f32, y1: f32, stops: &[(f32, u32)]) -> Self {
+        Gradient { kind: GradientKind::Linear, start: (x0, y0), end: (x1, y1), stops: stops.iter().map(|&(position, color)| Stop { position, color }).collect() }
+    }
+
+    pub fn radial(cx: f32, cy: f32, radius: f32, stops: &[(f32, u32)]) -> Self {
+        Gradient { kind: GradientKind::Radial, start: (cx, cy), end: (cx + radius, cy), stops: stops.iter().map(|&(position, color)| Stop { position, color }).collect() }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Stroke {
+    /// ARGB
+    pub color: u32,
+    pub thickness: f32,
+    /// 0 butt, 1 round, 2 square
+    #[serde(default)]
+    pub cap: u8,
+    /// 0 miter, 1 round, 2 bevel
+    #[serde(default)]
+    pub join: u8,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Feather {
+    pub strength: f32,
+    #[serde(default)]
+    pub offset: (f32, f32),
+    #[serde(default)]
+    pub inner: bool,
 }
 
 impl Shape {
@@ -324,7 +391,35 @@ impl Shape {
             paths: Vec::new(),
             fill_rule: FillRule::NonZero,
             parent: None,
+            gradient: None,
+            stroke: None,
+            feather: None,
         }
+    }
+
+    pub fn gradient(mut self, g: Gradient) -> Self {
+        self.gradient = Some(g);
+        self
+    }
+
+    pub fn stroke(mut self, color: u32, thickness: f32) -> Self {
+        self.stroke = Some(Stroke { color, thickness, cap: 1, join: 1 });
+        self
+    }
+
+    pub fn feather(mut self, strength: f32, dx: f32, dy: f32) -> Self {
+        self.feather = Some(Feather { strength, offset: (dx, dy), inner: false });
+        self
+    }
+
+    pub fn inner_shadow(mut self, strength: f32, dx: f32, dy: f32) -> Self {
+        self.feather = Some(Feather { strength, offset: (dx, dy), inner: true });
+        self
+    }
+
+    pub fn in_group(mut self, parent: u32) -> Self {
+        self.parent = Some(parent);
+        self
     }
 
     pub fn radius(mut self, r: f32) -> Self {
@@ -374,6 +469,8 @@ pub enum Prop {
     Opacity,
     CornerRadius,
     Fill,
+    /// The last stop of a gradient fill (Fill is the first stop, or the flat colour).
+    FillEnd,
     /// Point animation, for tracks with a `point`: its position, and its curve handles as an
     /// angle (degrees) and a length, the way Rive stores them.
     PointX,
@@ -413,7 +510,8 @@ impl Prop {
             Prop::ScaleY => s.scale_y as f64,
             Prop::Opacity => s.opacity as f64,
             Prop::CornerRadius => s.corner_radius as f64,
-            Prop::Fill => s.fill as f64,
+            Prop::Fill => s.gradient.as_ref().and_then(|g| g.stops.first()).map_or(s.fill, |st| st.color) as f64,
+            Prop::FillEnd => s.gradient.as_ref().and_then(|g| g.stops.last()).map_or(s.fill, |st| st.color) as f64,
             _ => 0.0,
         }
     }
@@ -429,7 +527,14 @@ impl Prop {
             Prop::ScaleY => s.scale_y = v as f32,
             Prop::Opacity => s.opacity = v as f32,
             Prop::CornerRadius => s.corner_radius = v as f32,
-            Prop::Fill => s.fill = v as u32,
+            Prop::Fill => match s.gradient.as_mut().and_then(|g| g.stops.first_mut()) {
+                Some(st) => st.color = v as u32,
+                None => s.fill = v as u32,
+            },
+            Prop::FillEnd => match s.gradient.as_mut().and_then(|g| g.stops.last_mut()) {
+                Some(st) => st.color = v as u32,
+                None => s.fill = v as u32,
+            },
             _ => {}
         }
     }
@@ -590,7 +695,7 @@ impl Track {
                     Ease::Linear => p,
                     Ease::Cubic { x1, y1, x2, y2 } => cubic_ease(x1, y1, x2, y2, p),
                 };
-                return Some(if self.prop == Prop::Fill {
+                return Some(if matches!(self.prop, Prop::Fill | Prop::FillEnd) {
                     lerp_colour(a.value as u32, b.value as u32, f) as f64
                 } else {
                     a.value + (b.value - a.value) * f
@@ -697,7 +802,9 @@ impl Default for Document {
 struct Placed {
     shape: u64,
     path: Option<u64>,
-    colour: Option<u64>,
+    /// The component holding the fill colour, and its type (SolidColor or GradientStop).
+    colour: Option<(u64, &'static str)>,
+    colour_end: Option<(u64, &'static str)>,
 }
 
 fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
@@ -749,7 +856,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ("scaleY", Double(s.scale_y)),
                 ("opacity", Double(s.opacity)),
             ]));
-            placed.push((s.id, s.kind, Placed { shape: node, path: None, colour: None }));
+            placed.push((s.id, s.kind, Placed { shape: node, path: None, colour: None, colour_end: None }));
             for c in doc.shapes.iter().filter(|c| c.parent == Some(s.id)) {
                 stack.push((c.id, node));
             }
@@ -817,8 +924,48 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
             FillRule::EvenOdd => 1,
         };
         let fill = comp(b.add("Fill", &[("parentId", Uint(shape)), ("fillRule", Uint(fill_rule))]));
-        let colour = comp(b.add("SolidColor", &[("parentId", Uint(fill)), ("colorValue", Color(s.fill))]));
-        placed.push((s.id, s.kind, Placed { shape, path: Some(path), colour: Some(colour) }));
+        let (colour, colour_end) = match &s.gradient {
+            None => {
+                let c = comp(b.add("SolidColor", &[("parentId", Uint(fill)), ("colorValue", Color(s.fill))]));
+                ((c, "SolidColor"), (c, "SolidColor"))
+            }
+            Some(g) => {
+                let kind = if g.kind == GradientKind::Linear { "LinearGradient" } else { "RadialGradient" };
+                let gid = comp(b.add(kind, &[
+                    ("parentId", Uint(fill)),
+                    ("startX", Double(g.start.0)),
+                    ("startY", Double(g.start.1)),
+                    ("endX", Double(g.end.0)),
+                    ("endY", Double(g.end.1)),
+                ]));
+                let stops: Vec<u64> = g
+                    .stops
+                    .iter()
+                    .map(|st| comp(b.add("GradientStop", &[("parentId", Uint(gid)), ("colorValue", Color(st.color)), ("position", Double(st.position))])))
+                    .collect();
+                let first = *stops.first().unwrap_or(&gid);
+                ((first, "GradientStop"), (*stops.last().unwrap_or(&first), "GradientStop"))
+            }
+        };
+        if let Some(f) = &s.feather {
+            comp(b.add("Feather", &[
+                ("parentId", Uint(fill)),
+                ("strength", Double(f.strength)),
+                ("offsetX", Double(f.offset.0)),
+                ("offsetY", Double(f.offset.1)),
+                ("inner", Value::Bool(f.inner)),
+            ]));
+        }
+        if let Some(st) = &s.stroke {
+            let sid = comp(b.add("Stroke", &[
+                ("parentId", Uint(shape)),
+                ("thickness", Double(st.thickness)),
+                ("cap", Uint(st.cap as u64)),
+                ("join", Uint(st.join as u64)),
+            ]));
+            comp(b.add("SolidColor", &[("parentId", Uint(sid)), ("colorValue", Color(st.color))]));
+        }
+        placed.push((s.id, s.kind, Placed { shape, path: Some(path), colour: Some(colour), colour_end: Some(colour_end) }));
     }
 
     // Events are artboard components the app can listen for.
@@ -871,7 +1018,9 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ShapeKind::Ellipse => "Ellipse",
                 ShapeKind::Path | ShapeKind::Group => "",
             };
-            let (path, colour) = (p.path.unwrap_or(p.shape), p.colour.unwrap_or(p.shape));
+            let path = p.path.unwrap_or(p.shape);
+            let (colour, colour_owner) = p.colour.unwrap_or((p.shape, "SolidColor"));
+            let (colour_end, colour_end_owner) = p.colour_end.unwrap_or((p.shape, "SolidColor"));
             let vertex = t.point.and_then(|pr| vertices.get(&(t.shape_id, pr.path, pr.index)).copied());
             let entries: Vec<(u64, &str, &str)> = match t.prop {
                 _ if t.prop.is_point() => match (vertex, t.prop) {
@@ -884,7 +1033,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                     (Some((v, true)), Prop::OutLength) => vec![(v, "CubicDetachedVertex", "outDistance")],
                     _ => vec![],
                 },
-                Prop::Width | Prop::Height | Prop::CornerRadius | Prop::Fill if *kind == ShapeKind::Group => vec![],
+                Prop::Width | Prop::Height | Prop::CornerRadius | Prop::Fill | Prop::FillEnd if *kind == ShapeKind::Group => vec![],
                 Prop::X | Prop::Y | Prop::Rotation | Prop::ScaleX | Prop::ScaleY | Prop::Opacity if *kind == ShapeKind::Group => {
                     let name = match t.prop {
                         Prop::X => "x",
@@ -910,7 +1059,8 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                     .map(|n| (path, "Rectangle", n))
                     .collect(),
                 Prop::CornerRadius => vec![],
-                Prop::Fill => vec![(colour, "SolidColor", "colorValue")],
+                Prop::Fill => vec![(colour, colour_owner, "colorValue")],
+                Prop::FillEnd => vec![(colour_end, colour_end_owner, "colorValue")],
                 _ => vec![],
             };
             for (object, owner, name) in entries {
@@ -937,7 +1087,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                     if let Some(i) = interpolator {
                         props.push(("interpolatorId", Uint(i)));
                     }
-                    if t.prop == Prop::Fill {
+                    if matches!(t.prop, Prop::Fill | Prop::FillEnd) {
                         props.push(("value", Color(k.value as u32)));
                         b.add("KeyFrameColor", &props);
                     } else {
@@ -1004,7 +1154,7 @@ fn export_state_machine(b: &mut Builder, sm: &StateMachine, placed: &[(u32, Shap
                 StateKind::Blend1D { input, children } => {
                     // Flag 2 (reset) makes the mix a true weighted average; without it Rive layers
                     // the poses one after another and a 50/50 blend lands at two thirds.
-                    let mut p = vec![("inputId", Uint(*input as u64)), ("flags", Uint(flags | 2))];
+                    let p = vec![("inputId", Uint(*input as u64)), ("flags", Uint(flags | 2))];
                     let at = b.add("BlendState1DInput", &p);
                     for (anim, value) in children {
                         b.add("BlendAnimation1D", &[("animationId", Uint(*anim as u64)), ("value", Double(*value))]);
@@ -1072,24 +1222,7 @@ mod tests {
 
     fn demo() -> Document {
         let mut d = Document::new();
-        d.shapes.push(Shape {
-            id: 1,
-            name: "ball".into(),
-            kind: ShapeKind::Ellipse,
-            x: 100.0,
-            y: 250.0,
-            width: 80.0,
-            height: 80.0,
-            rotation: 0.0,
-            scale_x: 1.0,
-            scale_y: 1.0,
-            opacity: 1.0,
-            corner_radius: 0.0,
-            fill: 0xffff6b6b,
-            paths: Vec::new(),
-            fill_rule: FillRule::NonZero,
-            parent: None,
-        });
+        d.shapes.push(Shape::new(1, "ball", ShapeKind::Ellipse, 100.0, 250.0, 80.0, 80.0, 0xffff6b6b));
         d.animations[0].tracks.push(Track {
             shape_id: 1,
             prop: Prop::X,
@@ -1232,6 +1365,24 @@ mod tests {
             pos = names[pos..].iter().position(|n| *n == want).map(|p| p + pos + 1).unwrap_or_else(|| panic!("{want} missing or out of order"));
         }
         assert_eq!(names.iter().filter(|n| **n == "StateMachine").count(), 1, "no default machine when one is given");
+    }
+
+    #[test]
+    fn paints_export_and_animate_gradient_stops() {
+        let mut d = Document::new();
+        d.shapes.push(Shape::new(1, "bar", ShapeKind::Rectangle, 100.0, 50.0, 200.0, 20.0, 0xffffffff)
+            .gradient(Gradient::linear(-100.0, 0.0, 100.0, 0.0, &[(0.0, 0xffff8a00), (1.0, 0xffffc837)]))
+            .stroke(0xff000000, 2.0)
+            .feather(12.0, 0.0, 4.0));
+        d.animations[0].tracks.push(Track { shape_id: 1, prop: Prop::FillEnd, point: None, keys: vec![Key { frame: 0, value: 0xffffc837u32 as f64, ease: Ease::Linear }] });
+        let file = vectro_riv::read(&d.export_riv(), &Schema::bundled()).expect("valid .riv");
+        let names: Vec<&str> = file.objects.iter().filter_map(|o| o.type_name.as_deref()).collect();
+        for want in ["LinearGradient", "GradientStop", "Feather", "Stroke", "KeyFrameColor"] {
+            assert!(names.contains(&want), "missing {want}");
+        }
+        let keyed = file.objects.iter().find(|o| o.type_name.as_deref() == Some("KeyedProperty")).unwrap();
+        assert_eq!(keyed.properties[0].value, Value::Uint(38), "GradientStop.colorValue, not SolidColor's 37");
+        assert_eq!(d.evaluate(Some(0), 0.0)[0].gradient.as_ref().unwrap().stops[1].color, 0xffffc837);
     }
 
     #[test]
