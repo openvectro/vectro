@@ -35,8 +35,8 @@
   {/if}
   <ul>
     {#each layers as { s, depth } (s.id)}
-      <li class:selected={editor.selected === s.id} style:padding-left="{depth * 14}px">
-        <button class="row" onclick={() => (editor.selected = s.id)} ondblclick={() => (renaming = s.id)}>
+      <li class:selected={editor.selectedIds.includes(s.id)} style:padding-left="{depth * 14}px">
+        <button class="row" onclick={(e) => (e.shiftKey ? editor.toggleSelected(s.id) : (editor.selected = s.id))} ondblclick={() => (renaming = s.id)}>
           {#if s.kind === "group"}<span class="group-icon">▾</span>{:else}<span class="swatch" class:round={s.kind === "ellipse"} class:path={s.kind === "path"} style:background={argbToCss(s.fill)}></span>{/if}
           {#if renaming === s.id}
             <!-- svelte-ignore a11y_autofocus -->

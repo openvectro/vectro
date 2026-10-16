@@ -32,7 +32,12 @@ npm run wasm   # builds the Rust core for the browser (needs wasm-pack)
 npm run dev    # http://127.0.0.1:5173
 ```
 
-Keys: V select, R rectangle, E ellipse, Space play, ⌫ delete, ⌘Z / ⇧⌘Z undo / redo.
+Tools: V select, R rectangle, E ellipse, P pen, N edit points (or double-click a path). Shift-click or
+drag a box to select several; ⌘G group, ⇧⌘G ungroup, ⌘D duplicate, arrows nudge (shift for 10),
+⌘A select all. Pen: click for corners, drag for curves, click the first point to close, Enter or
+double-click to finish. Points: drag points and handles, Alt-drag a point to pull handles out, Alt on a
+handle breaks the pair, double-click the outline to add a point, ⌫ removes one. View: ⌘-wheel or
+pinch zooms, wheel pans, space-drag pans, ⌘0 fits. Space plays, ⌘Z / ⇧⌘Z undo / redo.
 
 ## Tools
 

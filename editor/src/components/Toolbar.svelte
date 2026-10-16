@@ -1,28 +1,28 @@
 <script lang="ts">
-  import { editor, type Tool } from "../lib/editor.svelte";
+  import { editor, type Align, type Tool } from "../lib/editor.svelte";
   import type { Doc } from "../lib/types";
 
   let { onPreview }: { onPreview: () => void } = $props();
   let fileInput: HTMLInputElement;
   let svgInput: HTMLInputElement;
 
-  async function importSvg(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    try {
-      const n = editor.importSvg(await file.text());
-      if (!n) editor.error = `${file.name} had no filled shapes to import`;
-    } catch (err) {
-      editor.error = `Could not import ${file.name}: ${err}`;
-    }
-    svgInput.value = "";
-  }
-
-  const tools: { tool: Tool; label: string; key: string }[] = [
-    { tool: "select", label: "Select", key: "V" },
-    { tool: "rectangle", label: "Rectangle", key: "R" },
-    { tool: "ellipse", label: "Ellipse", key: "E" },
+  const tools: { tool: Tool; label: string; key: string; glyph: string }[] = [
+    { tool: "select", label: "Select", key: "V", glyph: "↖" },
+    { tool: "rectangle", label: "Rectangle", key: "R", glyph: "▭" },
+    { tool: "ellipse", label: "Ellipse", key: "E", glyph: "◯" },
+    { tool: "pen", label: "Pen", key: "P", glyph: "✎" },
+    { tool: "node", label: "Edit points", key: "N", glyph: "⟟" },
   ];
+  const aligns: { how: Align; glyph: string; label: string }[] = [
+    { how: "left", glyph: "⫷", label: "Align left" },
+    { how: "hcenter", glyph: "⫼", label: "Align centre" },
+    { how: "right", glyph: "⫸", label: "Align right" },
+    { how: "top", glyph: "⤒", label: "Align top" },
+    { how: "vcenter", glyph: "⫵", label: "Align middle" },
+    { how: "bottom", glyph: "⤓", label: "Align bottom" },
+  ];
+  const hasSelection = $derived(editor.selectedIds.length > 0);
+  const isGroup = $derived(editor.selectedShape?.kind === "group");
 
   function download(data: BlobPart, name: string, type: string) {
     const url = URL.createObjectURL(new Blob([data], { type }));
@@ -55,18 +55,40 @@
     }
     fileInput.value = "";
   }
+
+  async function importSvg(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const n = editor.importSvg(await file.text());
+      if (!n) editor.error = `${file.name} had no filled shapes to import`;
+    } catch (err) {
+      editor.error = `Could not import ${file.name}: ${err}`;
+    }
+    svgInput.value = "";
+  }
 </script>
 
 <header>
   <div class="brand">Vectro</div>
   <div class="group">
     {#each tools as t}
-      <button class:active={editor.tool === t.tool} onclick={() => (editor.tool = t.tool)} title="{t.label} ({t.key})">{t.label}</button>
+      <button class="tool" class:active={editor.tool === t.tool} onclick={() => (editor.tool = t.tool)} title="{t.label} ({t.key})"><span class="glyph">{t.glyph}</span>{t.label}</button>
     {/each}
   </div>
   <div class="group mode">
     <button class:active={editor.mode === "design"} onclick={() => { editor.pause(); editor.mode = "design"; }}>Design</button>
     <button class:active={editor.mode === "animate"} onclick={() => (editor.mode = "animate")}>Animate</button>
+  </div>
+  <div class="group">
+    <button onclick={() => editor.group()} disabled={!hasSelection} title="Group (⌘G)">Group</button>
+    <button onclick={() => editor.ungroup()} disabled={!isGroup} title="Ungroup (⇧⌘G)">Ungroup</button>
+    <button onclick={() => editor.duplicate()} disabled={!hasSelection} title="Duplicate (⌘D)">Duplicate</button>
+  </div>
+  <div class="group align">
+    {#each aligns as a}
+      <button onclick={() => editor.align(a.how)} disabled={!hasSelection} title={a.label}>{a.glyph}</button>
+    {/each}
   </div>
   <div class="group">
     <button onclick={() => editor.undo()} title="Undo (⌘Z)">Undo</button>
@@ -88,9 +110,12 @@
 </header>
 
 <style>
-  header { display: flex; align-items: center; gap: 14px; padding: 8px 12px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  header { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
   .brand { font-weight: 700; letter-spacing: 0.02em; font-size: 15px; }
   .group { display: flex; gap: 4px; }
+  .tool { display: flex; gap: 6px; align-items: center; }
+  .glyph { font-size: 14px; line-height: 1; opacity: 0.85; }
+  .align button { padding: 4px 7px; font-size: 14px; line-height: 1; }
   .mode button.active { background: var(--key); border-color: var(--key); color: #000; }
   .mode button:first-child.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .spacer { flex: 1; }
