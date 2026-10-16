@@ -12,7 +12,7 @@
   const selTransition = $derived(sel?.type === "transition" && layer ? layer.transitions[sel.index] : null);
 
   const W = 150, H = 44;
-  const pos = (s: State, i: number): [number, number] => s.ui ?? [220 + ((i - 3) % 3) * 190, 40 + Math.floor((i - 3) / 3) * 110];
+  const pos = (s: State, i: number): [number, number] => s.ui ?? [240 + ((i - 3) % 3) * 240, 40 + Math.floor((i - 3) / 3) * 120];
 
   function edit(fn: () => void) {
     editor.checkpoint();

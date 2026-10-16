@@ -34,7 +34,7 @@ export function ensureMachines(doc: Doc) {
 export function addState(layer: Layer, state: State) {
   // Place new states in a loose grid to the right of the fixed three.
   const n = layer.states.length - 3;
-  state.ui ??= [220 + (n % 3) * 190, 40 + Math.floor(n / 3) * 110];
+  state.ui ??= [240 + (n % 3) * 240, 40 + Math.floor(n / 3) * 120];
   layer.states.push(state);
   return layer.states.length - 1;
 }
