@@ -65,6 +65,9 @@ pub struct State {
     /// Pick among this state's valid transitions at random, by `random_weight`.
     #[serde(default)]
     pub random: bool,
+    /// Where the editor draws this state in the graph; not part of the exported file.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ui: Option<(f32, f32)>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -170,7 +173,7 @@ pub struct StateMachine {
 impl Layer {
     /// A layer with the three states every Rive layer starts with: Entry (0), Any (1), Exit (2).
     pub fn new(name: &str) -> Self {
-        let std = |n: &str, kind| State { name: n.into(), kind, random: false };
+        let std = |n: &str, kind| State { name: n.into(), kind, random: false, ui: None };
         Layer {
             name: name.into(),
             states: vec![std("Entry", StateKind::Entry), std("Any", StateKind::Any), std("Exit", StateKind::Exit)],
@@ -180,12 +183,12 @@ impl Layer {
 
     /// Add a state that plays `animation`; returns its index.
     pub fn animation(&mut self, name: &str, animation: usize) -> usize {
-        self.states.push(State { name: name.into(), kind: StateKind::Animation { animation, speed: 1.0 }, random: false });
+        self.states.push(State { name: name.into(), kind: StateKind::Animation { animation, speed: 1.0 }, random: false, ui: None });
         self.states.len() - 1
     }
 
     pub fn blend(&mut self, name: &str, input: usize, children: Vec<(usize, f32)>) -> usize {
-        self.states.push(State { name: name.into(), kind: StateKind::Blend1D { input, children }, random: false });
+        self.states.push(State { name: name.into(), kind: StateKind::Blend1D { input, children }, random: false, ui: None });
         self.states.len() - 1
     }
 

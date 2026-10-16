@@ -34,6 +34,12 @@ class Editor {
   error = $state<string | null>(null);
   /** The viewport: zoom factor and the artboard point at the top-left of the padding. */
   view = $state({ zoom: 1, x: 0, y: 0 });
+  /** Which bottom panel is open. */
+  panel = $state<"timeline" | "machines">("timeline");
+  /** State machine editing: the machine and layer in view, and what is picked in the graph. */
+  machine = $state(0);
+  layer = $state(0);
+  smSelection = $state<{ type: "state"; index: number } | { type: "transition"; index: number } | null>(null);
 
   private past: string[] = [];
   private future: string[] = [];
@@ -104,6 +110,17 @@ class Editor {
     this.selectedVertex = null;
     this.anim = Math.min(this.anim, this.doc.animations.length - 1);
     this.selectedKey = null;
+    this.machine = Math.max(0, Math.min(this.machine, (this.doc.stateMachines?.length ?? 1) - 1));
+    this.layer = Math.max(0, Math.min(this.layer, (this.doc.stateMachines?.[this.machine]?.layers.length ?? 1) - 1));
+    this.smSelection = null;
+  }
+
+  get stateMachine() {
+    return this.doc.stateMachines?.[this.machine] ?? null;
+  }
+
+  get smLayer() {
+    return this.stateMachine?.layers[this.layer] ?? null;
   }
 
   save() {

@@ -4,7 +4,7 @@
   import Layers from "./components/Layers.svelte";
   import Canvas from "./components/Canvas.svelte";
   import Properties from "./components/Properties.svelte";
-  import Timeline from "./components/Timeline.svelte";
+  import Bottom from "./components/Bottom.svelte";
   import Preview from "./components/Preview.svelte";
 
   let previewOpen = $state(false);
@@ -87,7 +87,7 @@
     <Canvas bind:this={canvas} />
     <Properties />
   </div>
-  <Timeline />
+  <Bottom />
 </div>
 {#if previewOpen}
   <Preview onClose={() => (previewOpen = false)} />

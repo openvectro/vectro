@@ -103,7 +103,29 @@ export interface Key { frame: number; value: number; ease: Ease }
 export interface Track { shapeId: number; prop: Prop; point?: { path: number; index: number }; keys: Key[] }
 export interface Animation { name: string; fps: number; duration: number; loop: LoopMode; tracks: Track[] }
 export interface Artboard { name: string; width: number; height: number; background: number }
-export interface Doc { version: number; artboard: Artboard; shapes: Shape[]; animations: Animation[] }
+// State machines, mirroring crates/vectro-doc.
+export type InputKind = "bool" | "number" | "trigger";
+export interface Input { name: string; kind: InputKind; value: number }
+export type StateKind =
+  | { type: "entry" } | { type: "any" } | { type: "exit" }
+  | { type: "animation"; animation: number; speed?: number }
+  | { type: "blend1D"; input: number; children: [number, number][] };
+export interface State { name: string; kind: StateKind; random?: boolean; ui?: [number, number] }
+export type Op = "equal" | "notEqual" | "lessOrEqual" | "greaterOrEqual" | "less" | "greater";
+export interface Condition { input: number; op: Op; value: number }
+export interface Transition { from: number; to: number; durationMs?: number; exitAfterMs?: number; conditions: Condition[]; randomWeight?: number }
+export interface Layer { name: string; states: State[]; transitions: Transition[] }
+export type PointerKind = "enter" | "exit" | "down" | "up" | "move" | "click";
+export type Action =
+  | { type: "setBool"; input: number; value: boolean }
+  | { type: "toggleBool"; input: number }
+  | { type: "setNumber"; input: number; value: number }
+  | { type: "fireTrigger"; input: number }
+  | { type: "fireEvent"; event: number };
+export interface Listener { target: number; event: PointerKind; actions: Action[] }
+export interface StateMachine { name: string; inputs: Input[]; layers: Layer[]; listeners: Listener[] }
+
+export interface Doc { version: number; artboard: Artboard; shapes: Shape[]; animations: Animation[]; events?: string[]; stateMachines?: StateMachine[] }
 
 export const PROPS: { prop: ShapeProp; label: string; step: number; min?: number; max?: number }[] = [
   { prop: "x", label: "X", step: 1 },

@@ -15,7 +15,10 @@ back, and export `.riv`. Rive's own web runtime plays the export the same way th
 shows it (checked frame by frame). State machines work in the core (`vectro-doc`): inputs, layers, states, number-driven blends,
 transitions with exit times and random choice, pointer listeners and events. Two files prove it in
 Rive's runtime: a loading bar and a tiny whack-a-mole game, drawn with gradients, strokes and
-Rive's feather (soft shadows and glows). The editor's state machine screen is next.
+Rive's feather (soft shadows and glows). The editor has a **State machines** tab: inputs, layers,
+a node graph (drag a state's port onto another state to add a transition), conditions, exit times,
+blends, random weights, and pointer listeners on shapes. **Preview** plays a machine with Rive's own
+runtime and gives every input a control.
 
 ```
 cargo run --release -p vectro-doc --example loading_bar -- tests/web/loading-bar.riv
