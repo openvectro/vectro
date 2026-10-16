@@ -1,0 +1,1602 @@
+{
+  "version": 1,
+  "artboard": {
+    "name": "Whack a dot",
+    "width": 640.0,
+    "height": 400.0,
+    "background": 4280163876
+  },
+  "shapes": [
+    {
+      "id": 1,
+      "name": "hole 1",
+      "kind": "ellipse",
+      "x": 160.0,
+      "y": 250.0,
+      "width": 120.0,
+      "height": 44.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4280953395,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 2,
+      "name": "hole 2",
+      "kind": "ellipse",
+      "x": 320.0,
+      "y": 250.0,
+      "width": 120.0,
+      "height": 44.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4280953395,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 3,
+      "name": "hole 3",
+      "kind": "ellipse",
+      "x": 480.0,
+      "y": 250.0,
+      "width": 120.0,
+      "height": 44.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4280953395,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 4,
+      "name": "dot 1",
+      "kind": "ellipse",
+      "x": 160.0,
+      "y": 250.0,
+      "width": 72.0,
+      "height": 72.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294551066,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 5,
+      "name": "dot 2",
+      "kind": "ellipse",
+      "x": 320.0,
+      "y": 250.0,
+      "width": 72.0,
+      "height": 72.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294551066,
+      "fillRule": "nonZero"
+    },
+    {
+      "id": 6,
+      "name": "dot 3",
+      "kind": "ellipse",
+      "x": 480.0,
+      "y": 250.0,
+      "width": 72.0,
+      "height": 72.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 0.0,
+      "cornerRadius": 0.0,
+      "fill": 4294551066,
+      "fillRule": "nonZero"
+    }
+  ],
+  "animations": [
+    {
+      "name": "down 1",
+      "fps": 60,
+      "duration": 240,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 4,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 250.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "up 1",
+      "fps": 60,
+      "duration": 18,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 4,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 4,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.15,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.15,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 250.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 190.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hit 1",
+      "fps": 60,
+      "duration": 20,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 4,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 1.5,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 0.5,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 4,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 190.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 215.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "down 2",
+      "fps": 60,
+      "duration": 240,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 5,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 250.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "up 2",
+      "fps": 60,
+      "duration": 18,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 5,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 4,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.15,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.15,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 250.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 190.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hit 2",
+      "fps": 60,
+      "duration": 20,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 5,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 1.5,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 0.5,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 5,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 190.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 215.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "down 3",
+      "fps": 60,
+      "duration": 240,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 6,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 250.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "up 3",
+      "fps": 60,
+      "duration": 18,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 6,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 4,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.15,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.2,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.34,
+                "y1": 1.56,
+                "x2": 0.64,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 1.15,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 18,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 250.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 10,
+              "value": 190.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hit 3",
+      "fps": 60,
+      "duration": 20,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 6,
+          "prop": "scaleX",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 1.5,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "scaleY",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 0.5,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "opacity",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            },
+            {
+              "frame": 8,
+              "value": 1.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 20,
+              "value": 0.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        },
+        {
+          "shapeId": 6,
+          "prop": "y",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 190.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.16,
+                "y1": 1.0,
+                "x2": 0.3,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 4,
+              "value": 215.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "events": [
+    "hit"
+  ],
+  "stateMachines": [
+    {
+      "name": "Game",
+      "inputs": [
+        {
+          "name": "hit1",
+          "kind": "trigger",
+          "value": 0.0
+        },
+        {
+          "name": "hit2",
+          "kind": "trigger",
+          "value": 0.0
+        },
+        {
+          "name": "hit3",
+          "kind": "trigger",
+          "value": 0.0
+        }
+      ],
+      "layers": [
+        {
+          "name": "Dot 1",
+          "states": [
+            {
+              "name": "Entry",
+              "kind": {
+                "type": "entry"
+              },
+              "random": false
+            },
+            {
+              "name": "Any",
+              "kind": {
+                "type": "any"
+              },
+              "random": false
+            },
+            {
+              "name": "Exit",
+              "kind": {
+                "type": "exit"
+              },
+              "random": false
+            },
+            {
+              "name": "Down",
+              "kind": {
+                "type": "animation",
+                "animation": 0,
+                "speed": 1.0
+              },
+              "random": true
+            },
+            {
+              "name": "Wait short",
+              "kind": {
+                "type": "animation",
+                "animation": 0,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Wait mid",
+              "kind": {
+                "type": "animation",
+                "animation": 0,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Wait long",
+              "kind": {
+                "type": "animation",
+                "animation": 0,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Up",
+              "kind": {
+                "type": "animation",
+                "animation": 1,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Hit",
+              "kind": {
+                "type": "animation",
+                "animation": 2,
+                "speed": 1.0
+              },
+              "random": false
+            }
+          ],
+          "transitions": [
+            {
+              "from": 0,
+              "to": 3,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 4,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 4,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 600,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 5,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 5,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 1300,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 6,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 6,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 2200,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 7,
+              "to": 3,
+              "durationMs": 150,
+              "exitAfterMs": 1400,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 7,
+              "to": 8,
+              "durationMs": 0,
+              "conditions": [
+                {
+                  "input": 0,
+                  "op": "equal",
+                  "value": 0.0
+                }
+              ],
+              "randomWeight": 1
+            },
+            {
+              "from": 8,
+              "to": 3,
+              "durationMs": 0,
+              "exitAfterMs": 350,
+              "conditions": [],
+              "randomWeight": 1
+            }
+          ]
+        },
+        {
+          "name": "Dot 2",
+          "states": [
+            {
+              "name": "Entry",
+              "kind": {
+                "type": "entry"
+              },
+              "random": false
+            },
+            {
+              "name": "Any",
+              "kind": {
+                "type": "any"
+              },
+              "random": false
+            },
+            {
+              "name": "Exit",
+              "kind": {
+                "type": "exit"
+              },
+              "random": false
+            },
+            {
+              "name": "Down",
+              "kind": {
+                "type": "animation",
+                "animation": 3,
+                "speed": 1.0
+              },
+              "random": true
+            },
+            {
+              "name": "Wait short",
+              "kind": {
+                "type": "animation",
+                "animation": 3,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Wait mid",
+              "kind": {
+                "type": "animation",
+                "animation": 3,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Wait long",
+              "kind": {
+                "type": "animation",
+                "animation": 3,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Up",
+              "kind": {
+                "type": "animation",
+                "animation": 4,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Hit",
+              "kind": {
+                "type": "animation",
+                "animation": 5,
+                "speed": 1.0
+              },
+              "random": false
+            }
+          ],
+          "transitions": [
+            {
+              "from": 0,
+              "to": 3,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 4,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 4,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 600,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 5,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 5,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 1300,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 6,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 6,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 2200,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 7,
+              "to": 3,
+              "durationMs": 150,
+              "exitAfterMs": 1400,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 7,
+              "to": 8,
+              "durationMs": 0,
+              "conditions": [
+                {
+                  "input": 1,
+                  "op": "equal",
+                  "value": 0.0
+                }
+              ],
+              "randomWeight": 1
+            },
+            {
+              "from": 8,
+              "to": 3,
+              "durationMs": 0,
+              "exitAfterMs": 350,
+              "conditions": [],
+              "randomWeight": 1
+            }
+          ]
+        },
+        {
+          "name": "Dot 3",
+          "states": [
+            {
+              "name": "Entry",
+              "kind": {
+                "type": "entry"
+              },
+              "random": false
+            },
+            {
+              "name": "Any",
+              "kind": {
+                "type": "any"
+              },
+              "random": false
+            },
+            {
+              "name": "Exit",
+              "kind": {
+                "type": "exit"
+              },
+              "random": false
+            },
+            {
+              "name": "Down",
+              "kind": {
+                "type": "animation",
+                "animation": 6,
+                "speed": 1.0
+              },
+              "random": true
+            },
+            {
+              "name": "Wait short",
+              "kind": {
+                "type": "animation",
+                "animation": 6,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Wait mid",
+              "kind": {
+                "type": "animation",
+                "animation": 6,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Wait long",
+              "kind": {
+                "type": "animation",
+                "animation": 6,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Up",
+              "kind": {
+                "type": "animation",
+                "animation": 7,
+                "speed": 1.0
+              },
+              "random": false
+            },
+            {
+              "name": "Hit",
+              "kind": {
+                "type": "animation",
+                "animation": 8,
+                "speed": 1.0
+              },
+              "random": false
+            }
+          ],
+          "transitions": [
+            {
+              "from": 0,
+              "to": 3,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 4,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 4,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 600,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 5,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 5,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 1300,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 3,
+              "to": 6,
+              "durationMs": 0,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 6,
+              "to": 7,
+              "durationMs": 0,
+              "exitAfterMs": 2200,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 7,
+              "to": 3,
+              "durationMs": 150,
+              "exitAfterMs": 1400,
+              "conditions": [],
+              "randomWeight": 1
+            },
+            {
+              "from": 7,
+              "to": 8,
+              "durationMs": 0,
+              "conditions": [
+                {
+                  "input": 2,
+                  "op": "equal",
+                  "value": 0.0
+                }
+              ],
+              "randomWeight": 1
+            },
+            {
+              "from": 8,
+              "to": 3,
+              "durationMs": 0,
+              "exitAfterMs": 350,
+              "conditions": [],
+              "randomWeight": 1
+            }
+          ]
+        }
+      ],
+      "listeners": [
+        {
+          "target": 4,
+          "event": "down",
+          "actions": [
+            {
+              "type": "fireTrigger",
+              "input": 0
+            },
+            {
+              "type": "fireEvent",
+              "event": 0
+            }
+          ]
+        },
+        {
+          "target": 5,
+          "event": "down",
+          "actions": [
+            {
+              "type": "fireTrigger",
+              "input": 1
+            },
+            {
+              "type": "fireEvent",
+              "event": 0
+            }
+          ]
+        },
+        {
+          "target": 6,
+          "event": "down",
+          "actions": [
+            {
+              "type": "fireTrigger",
+              "input": 2
+            },
+            {
+              "type": "fireEvent",
+              "event": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

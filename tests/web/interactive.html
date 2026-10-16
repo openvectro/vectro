@@ -1,0 +1,68 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Vectro interactive test</title>
+<style>
+  body { margin: 0; background: #111; color: #ddd; font: 14px system-ui; display: grid; grid-template-columns: 640px 1fr; gap: 16px; padding: 16px; }
+  canvas { display: block; background: #16161a; }
+  label { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
+  pre { font-size: 12px; max-height: 300px; overflow: auto; background: #000; padding: 8px; }
+</style>
+<div>
+  <canvas id="c" width="640" height="400"></canvas>
+  <div id="inputs"></div>
+</div>
+<div>
+  <div>State changes</div><pre id="states"></pre>
+  <div>Events</div><pre id="events"></pre>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@rive-app/canvas@2.44.0/rive.js"></script>
+<script>
+// Loads ?file=<riv>&sm=<state machine> and gives every input a control; logs states and events.
+const params = new URLSearchParams(location.search);
+const sm = params.get("sm");
+window.report = { loaded: false, error: null, states: [], events: [] };
+const log = (id, m) => (document.getElementById(id).textContent += m + "\n");
+rive.Rive.suppressDeprecationWarnings = ["state-change-events", "state-machines-param", "rive-events", "state-machine-inputs"];
+const canvas = document.getElementById("c");
+const r = new rive.Rive({
+  src: params.get("file") + "?v=" + Date.now(),
+  canvas,
+  stateMachines: sm,
+  autoplay: true,
+  onLoad: () => {
+    report.loaded = true;
+    // Size the canvas to the artboard so canvas pixels are artboard units.
+    const b = r.bounds;
+    canvas.width = b.maxX - b.minX;
+    canvas.height = b.maxY - b.minY;
+    canvas.style.width = canvas.width + "px";
+    canvas.style.height = canvas.height + "px";
+    r.resizeDrawingSurfaceToCanvas();
+    const box = document.getElementById("inputs");
+    for (const input of r.stateMachineInputs(sm)) {
+      const label = document.createElement("label");
+      label.textContent = input.name + " ";
+      let el;
+      if (input.type === rive.StateMachineInputType.Boolean) {
+        el = Object.assign(document.createElement("input"), { type: "checkbox", checked: input.value });
+        el.onchange = () => (input.value = el.checked);
+      } else if (input.type === rive.StateMachineInputType.Number) {
+        el = Object.assign(document.createElement("input"), { type: "range", min: 0, max: 100, step: 1, value: input.value });
+        el.oninput = () => (input.value = Number(el.value));
+      } else {
+        el = Object.assign(document.createElement("button"), { textContent: "fire" });
+        el.onclick = () => input.fire();
+      }
+      el.dataset.input = input.name;
+      label.appendChild(el);
+      box.appendChild(label);
+    }
+  },
+  onLoadError: (e) => { report.error = String(e && (e.data || e.message || e)); log("states", "error " + report.error); },
+  onStateChange: (e) => { report.states.push(...e.data); log("states", e.data.join(", ")); },
+});
+r.on(rive.EventType.RiveEvent, (e) => { report.events.push(e.data.name); log("events", e.data.name); });
+window.rive_instance = r;
+window.setInput = (name, value) => { const i = r.stateMachineInputs(sm).find((x) => x.name === name); if (value === "fire") i.fire(); else i.value = value; };
+window.pixel = (x, y) => { const g = document.createElement("canvas"); g.width = canvas.width; g.height = canvas.height; const ctx = g.getContext("2d"); ctx.drawImage(canvas, 0, 0); const p = ctx.getImageData(x, y, 1, 1).data; return [p[0], p[1], p[2]]; };
+</script>

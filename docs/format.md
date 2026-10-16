@@ -96,3 +96,36 @@ with handles in polar form (`inRotation`/`inDistance`, `outRotation`/`outDistanc
 All outlines of one shape fill together under the `Fill`'s `fillRule` (0 non-zero, 1 even-odd),
 so a ring is two circles with even-odd. Checked by importing Snap's icon SVG: Rive's runtime
 draws it the same as the editor, cut-outs included.
+
+## State machines (2026-10-16)
+
+Proven with two files that run in Rive's web runtime with a real mouse: a loading bar driven by a
+number input (`examples/loading_bar.rs`) and a whack-a-dot game (`examples/whack.rs`). Open
+either in `tests/web/interactive.html?file=<riv>&sm=<machine>` to drive the inputs by hand.
+
+- **Order.** `StateMachine`, then its inputs, then each `StateMachineLayer` with its states in
+  order; a state's id is its position in the layer. Each state is followed by its blend children
+  (`BlendAnimation1D`) and then its transitions (`stateToId`), each followed by its conditions.
+  Listeners (`StateMachineListenerSingle` + actions) come after the layers.
+- **Ids.** `inputId` indexes the machine's inputs, `animationId` the artboard's animations,
+  `targetId` and `eventId` are artboard component indices. Events are components (`Event`,
+  type 128, with a name and `parentId` 0), so they must be written with the shapes.
+- **Transition flags.** 4 = exit time enabled (`exitTime` in milliseconds), 8 = exit time is a
+  percentage, 2 = duration is a percentage, 16 = pause on exit. `duration` is the blend in ms.
+- **Random.** A state with flag 1 picks among its valid transitions by `randomWeight`. Random
+  timing needs several short wait states with different exit times, because only transitions
+  that are valid right now take part in the draw.
+- **Blend by a number.** `BlendState1DInput` (type 76) with `inputId`, then `BlendAnimation1D`
+  children carrying `animationId` and the input `value` each stands for. **Set flag 2 (reset) on
+  the blend state**, or Rive applies the poses one after another instead of averaging them: a
+  50/50 blend of two widths then settles at two thirds, and the loading bar read 347 px instead
+  of 261. With the flag it is exactly linear.
+- **Conditions.** Bool: `opValue` 0 means "is true", 1 "is false". Number: op 0 equal, 1 not
+  equal, 2 less or equal, 3 greater or equal, 4 less, 5 greater, plus `value`. Trigger: input only.
+- **Listeners.** `listenerTypeValue`: 0 enter, 1 exit, 2 down, 3 up, 4 move, 6 click. Actions:
+  `ListenerBoolChange` (`value` 0 false, 1 true, 2 toggle), `ListenerNumberChange`,
+  `ListenerTriggerChange`, `ListenerFireEvent`. A listener on a shape under another shape still
+  fires: the hit test is against the target's own path.
+- **A note on the web runtime.** `@rive-app/canvas` 2.44 prints deprecation warnings for state
+  machine inputs, state-change callbacks and event subscriptions, pointing at data binding (view
+  models). They all still work; data binding is a later addition to this format reader.

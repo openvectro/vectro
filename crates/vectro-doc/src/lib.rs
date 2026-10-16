@@ -13,6 +13,220 @@ pub struct Document {
     pub artboard: Artboard,
     pub shapes: Vec<Shape>,
     pub animations: Vec<Animation>,
+    /// Names of events the file can report to the app (see `Action::FireEvent`).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub events: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub state_machines: Vec<StateMachine>,
+}
+
+// ----------------------------------------------------------------- state machines
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum InputKind {
+    Bool,
+    Number,
+    Trigger,
+}
+
+/// Something the app (or a listener) sets to drive the machine.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Input {
+    pub name: String,
+    pub kind: InputKind,
+    /// Starting value: 0 or 1 for a bool, any number for a number, unused for a trigger.
+    #[serde(default)]
+    pub value: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum StateKind {
+    Entry,
+    Any,
+    Exit,
+    /// Plays one animation (index into `Document::animations`).
+    Animation { animation: usize, #[serde(default = "one")] speed: f32 },
+    /// Mixes animations by a number input: each child is (animation, the input value it stands for).
+    Blend1D { input: usize, children: Vec<(usize, f32)> },
+}
+
+fn one() -> f32 {
+    1.0
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct State {
+    pub name: String,
+    pub kind: StateKind,
+    /// Pick among this state's valid transitions at random, by `random_weight`.
+    #[serde(default)]
+    pub random: bool,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+#[repr(u8)]
+pub enum Op {
+    Equal = 0,
+    NotEqual = 1,
+    LessOrEqual = 2,
+    GreaterOrEqual = 3,
+    Less = 4,
+    Greater = 5,
+}
+
+/// A test on one input. For a bool, `value` 1 means "is true"; for a trigger only `input` matters.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Condition {
+    pub input: usize,
+    #[serde(default = "equal")]
+    pub op: Op,
+    #[serde(default)]
+    pub value: f64,
+}
+
+fn equal() -> Op {
+    Op::Equal
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Transition {
+    /// Indices into the layer's `states`.
+    pub from: usize,
+    pub to: usize,
+    /// Blend length between the two states.
+    #[serde(default)]
+    pub duration_ms: u32,
+    /// Only after the source state has played this long.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub exit_after_ms: Option<u32>,
+    #[serde(default)]
+    pub conditions: Vec<Condition>,
+    #[serde(default = "one_u32")]
+    pub random_weight: u32,
+}
+
+fn one_u32() -> u32 {
+    1
+}
+
+/// States and transitions that run on their own; every layer of a machine runs at once.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Layer {
+    pub name: String,
+    pub states: Vec<State>,
+    pub transitions: Vec<Transition>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+#[repr(u8)]
+pub enum Pointer {
+    Enter = 0,
+    Exit = 1,
+    Down = 2,
+    Up = 3,
+    Move = 4,
+    Click = 6,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum Action {
+    SetBool { input: usize, value: bool },
+    ToggleBool { input: usize },
+    SetNumber { input: usize, value: f64 },
+    FireTrigger { input: usize },
+    /// Index into `Document::events`.
+    FireEvent { event: usize },
+}
+
+/// Pointer activity on a shape (or group) that changes inputs, with no app code.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Listener {
+    pub target: u32,
+    pub event: Pointer,
+    pub actions: Vec<Action>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct StateMachine {
+    pub name: String,
+    pub inputs: Vec<Input>,
+    pub layers: Vec<Layer>,
+    #[serde(default)]
+    pub listeners: Vec<Listener>,
+}
+
+impl Layer {
+    /// A layer with the three states every Rive layer starts with: Entry (0), Any (1), Exit (2).
+    pub fn new(name: &str) -> Self {
+        let std = |n: &str, kind| State { name: n.into(), kind, random: false };
+        Layer {
+            name: name.into(),
+            states: vec![std("Entry", StateKind::Entry), std("Any", StateKind::Any), std("Exit", StateKind::Exit)],
+            transitions: Vec::new(),
+        }
+    }
+
+    /// Add a state that plays `animation`; returns its index.
+    pub fn animation(&mut self, name: &str, animation: usize) -> usize {
+        self.states.push(State { name: name.into(), kind: StateKind::Animation { animation, speed: 1.0 }, random: false });
+        self.states.len() - 1
+    }
+
+    pub fn blend(&mut self, name: &str, input: usize, children: Vec<(usize, f32)>) -> usize {
+        self.states.push(State { name: name.into(), kind: StateKind::Blend1D { input, children }, random: false });
+        self.states.len() - 1
+    }
+
+    pub fn go(&mut self, from: usize, to: usize) -> &mut Transition {
+        self.transitions.push(Transition { from, to, duration_ms: 0, exit_after_ms: None, conditions: Vec::new(), random_weight: 1 });
+        self.transitions.last_mut().unwrap()
+    }
+}
+
+impl Transition {
+    pub fn blend_ms(&mut self, ms: u32) -> &mut Self {
+        self.duration_ms = ms;
+        self
+    }
+
+    pub fn after_ms(&mut self, ms: u32) -> &mut Self {
+        self.exit_after_ms = Some(ms);
+        self
+    }
+
+    pub fn when(&mut self, input: usize, op: Op, value: f64) -> &mut Self {
+        self.conditions.push(Condition { input, op, value });
+        self
+    }
+
+    pub fn when_true(&mut self, input: usize) -> &mut Self {
+        self.when(input, Op::Equal, 1.0)
+    }
+
+    pub fn when_false(&mut self, input: usize) -> &mut Self {
+        self.when(input, Op::Equal, 0.0)
+    }
+
+    pub fn on_trigger(&mut self, input: usize) -> &mut Self {
+        self.when(input, Op::Equal, 0.0)
+    }
+
+    pub fn weight(&mut self, w: u32) -> &mut Self {
+        self.random_weight = w;
+        self
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -91,6 +305,38 @@ pub struct Shape {
 }
 
 impl Shape {
+    /// A rectangle or ellipse at centre (x, y). `fill` is ARGB.
+    pub fn new(id: u32, name: &str, kind: ShapeKind, x: f32, y: f32, width: f32, height: f32, fill: u32) -> Self {
+        Shape {
+            id,
+            name: name.into(),
+            kind,
+            x,
+            y,
+            width,
+            height,
+            rotation: 0.0,
+            scale_x: 1.0,
+            scale_y: 1.0,
+            opacity: 1.0,
+            corner_radius: 0.0,
+            fill,
+            paths: Vec::new(),
+            fill_rule: FillRule::NonZero,
+            parent: None,
+        }
+    }
+
+    pub fn radius(mut self, r: f32) -> Self {
+        self.corner_radius = r;
+        self
+    }
+
+    pub fn opacity(mut self, o: f32) -> Self {
+        self.opacity = o;
+        self
+    }
+
     /// Bounds of a path's points (handles included), relative to its origin.
     pub fn path_bounds(&self) -> Option<(f32, f32, f32, f32)> {
         let mut it = self.paths.iter().flat_map(|p| &p.points).flat_map(|v| [(v.x, v.y), (v.in_x, v.in_y), (v.out_x, v.out_y)]);
@@ -247,6 +493,21 @@ pub struct Animation {
 }
 
 impl Animation {
+    pub fn new(name: &str, fps: u32, duration: u32, loop_mode: LoopMode) -> Self {
+        Animation { name: name.into(), fps, duration, loop_mode, tracks: Vec::new() }
+    }
+
+    /// Key `prop` of a shape: `keys` are (frame, value, ease out of that key).
+    pub fn key(&mut self, shape_id: u32, prop: Prop, keys: &[(u32, f64, Ease)]) -> &mut Self {
+        self.tracks.push(Track {
+            shape_id,
+            prop,
+            point: None,
+            keys: keys.iter().map(|&(frame, value, ease)| Key { frame, value, ease }).collect(),
+        });
+        self
+    }
+
     /// The frame shown `seconds` after the animation starts, honouring its loop mode.
     pub fn frame_at(&self, seconds: f64) -> f64 {
         let d = self.duration.max(1) as f64;
@@ -380,6 +641,8 @@ impl Document {
                 loop_mode: LoopMode::Loop,
                 tracks: Vec::new(),
             }],
+            events: Vec::new(),
+            state_machines: Vec::new(),
         }
     }
 
@@ -558,6 +821,13 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
         placed.push((s.id, s.kind, Placed { shape, path: Some(path), colour: Some(colour) }));
     }
 
+    // Events are artboard components the app can listen for.
+    let event_ids: Vec<u64> = doc
+        .events
+        .iter()
+        .map(|name| comp(b.add("Event", &[("name", Str(name.clone())), ("parentId", Uint(0))])))
+        .collect();
+
     // Each distinct cubic ease becomes one interpolator component that keyframes point at.
     let mut eases: Vec<(Ease, u64)> = Vec::new();
     for a in &doc.animations {
@@ -684,8 +954,11 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
         }
     }
 
+    for sm in &doc.state_machines {
+        export_state_machine(&mut b, sm, &placed, &event_ids);
+    }
     // A default state machine that plays the first animation, for apps that drive state machines.
-    if !doc.animations.is_empty() {
+    if doc.state_machines.is_empty() && !doc.animations.is_empty() {
         b.add("StateMachine", &[("name", Str("State Machine 1".into()))]);
         b.add("StateMachineLayer", &[("name", Str("Layer 1".into()))]);
         b.add("EntryState", &[]);
@@ -695,6 +968,102 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
         b.add("AnimationState", &[("animationId", Uint(0))]);
     }
     b.finish()
+}
+
+fn export_state_machine(b: &mut Builder, sm: &StateMachine, placed: &[(u32, ShapeKind, Placed)], events: &[u64]) {
+    use Value::{Double, String as Str, Uint};
+    b.add("StateMachine", &[("name", Str(sm.name.clone()))]);
+    for i in &sm.inputs {
+        let name = ("name", Str(i.name.clone()));
+        match i.kind {
+            InputKind::Bool => b.add("StateMachineBool", &[name, ("value", Value::Bool(i.value != 0.0))]),
+            InputKind::Number => b.add("StateMachineNumber", &[name, ("value", Double(i.value as f32))]),
+            InputKind::Trigger => b.add("StateMachineTrigger", &[name]),
+        };
+    }
+    for layer in &sm.layers {
+        b.add("StateMachineLayer", &[("name", Str(layer.name.clone()))]);
+        // States in order (their index is their id in the layer); each followed by its
+        // blend children, then its transitions, each followed by its conditions.
+        for (si, st) in layer.states.iter().enumerate() {
+            let flags = u64::from(st.random);
+            match &st.kind {
+                StateKind::Entry => b.add("EntryState", &[]),
+                StateKind::Any => b.add("AnyState", &[]),
+                StateKind::Exit => b.add("ExitState", &[]),
+                StateKind::Animation { animation, speed } => {
+                    let mut p = vec![("animationId", Uint(*animation as u64))];
+                    if *speed != 1.0 {
+                        p.push(("speed", Double(*speed)));
+                    }
+                    if flags != 0 {
+                        p.push(("flags", Uint(flags)));
+                    }
+                    b.add("AnimationState", &p)
+                }
+                StateKind::Blend1D { input, children } => {
+                    // Flag 2 (reset) makes the mix a true weighted average; without it Rive layers
+                    // the poses one after another and a 50/50 blend lands at two thirds.
+                    let mut p = vec![("inputId", Uint(*input as u64)), ("flags", Uint(flags | 2))];
+                    let at = b.add("BlendState1DInput", &p);
+                    for (anim, value) in children {
+                        b.add("BlendAnimation1D", &[("animationId", Uint(*anim as u64)), ("value", Double(*value))]);
+                    }
+                    at
+                }
+            };
+            for t in layer.transitions.iter().filter(|t| t.from == si) {
+                let mut p = vec![("stateToId", Uint(t.to as u64))];
+                let mut flags = 0u64;
+                if t.duration_ms > 0 {
+                    p.push(("duration", Uint(t.duration_ms as u64)));
+                }
+                if let Some(ms) = t.exit_after_ms {
+                    flags |= 4; // exit time enabled, in milliseconds
+                    p.push(("exitTime", Uint(ms as u64)));
+                }
+                if flags != 0 {
+                    p.push(("flags", Uint(flags)));
+                }
+                if t.random_weight != 1 {
+                    p.push(("randomWeight", Uint(t.random_weight as u64)));
+                }
+                b.add("StateTransition", &p);
+                for c in &t.conditions {
+                    let input = ("inputId", Uint(c.input as u64));
+                    match sm.inputs.get(c.input).map(|i| i.kind) {
+                        // For a bool, op 0 means "is true" and 1 "is false".
+                        Some(InputKind::Bool) => b.add("TransitionBoolCondition", &[input, ("opValue", Uint(u64::from(c.value == 0.0)))]),
+                        Some(InputKind::Number) => {
+                            b.add("TransitionNumberCondition", &[input, ("opValue", Uint(c.op as u64)), ("value", Double(c.value as f32))])
+                        }
+                        Some(InputKind::Trigger) => b.add("TransitionTriggerCondition", &[input]),
+                        None => continue,
+                    };
+                }
+            }
+        }
+    }
+    for l in &sm.listeners {
+        let Some((_, _, p)) = placed.iter().find(|(id, _, _)| *id == l.target) else { continue };
+        b.add("StateMachineListenerSingle", &[("targetId", Uint(p.shape)), ("listenerTypeValue", Uint(l.event as u64))]);
+        for a in &l.actions {
+            match a {
+                Action::SetBool { input, value } => {
+                    b.add("ListenerBoolChange", &[("inputId", Uint(*input as u64)), ("value", Uint(u64::from(*value)))])
+                }
+                Action::ToggleBool { input } => b.add("ListenerBoolChange", &[("inputId", Uint(*input as u64)), ("value", Uint(2))]),
+                Action::SetNumber { input, value } => {
+                    b.add("ListenerNumberChange", &[("inputId", Uint(*input as u64)), ("value", Double(*value as f32))])
+                }
+                Action::FireTrigger { input } => b.add("ListenerTriggerChange", &[("inputId", Uint(*input as u64))]),
+                Action::FireEvent { event } => match events.get(*event) {
+                    Some(id) => b.add("ListenerFireEvent", &[("eventId", Uint(*id))]),
+                    None => continue,
+                },
+            };
+        }
+    }
 }
 
 #[cfg(test)]
@@ -829,6 +1198,40 @@ mod tests {
         let keyed: Vec<u64> = file.objects.iter().filter(|o| o.type_name.as_deref() == Some("KeyedProperty"))
             .filter_map(|o| match o.properties[0].value { Value::Uint(k) => Some(k), _ => None }).collect();
         assert!(keyed.contains(&24) && keyed.contains(&86), "keys Vertex.x (24) and outRotation (86)");
+    }
+
+    #[test]
+    fn state_machine_exports_in_rive_order() {
+        let mut d = demo();
+        d.animations.push(Animation::new("full", 60, 1, LoopMode::OneShot));
+        d.events.push("done".into());
+        let mut layer = Layer::new("Fill");
+        let bar = layer.blend("Bar", 0, vec![(0, 0.0), (1, 100.0)]);
+        let party = layer.animation("Party", 1);
+        layer.go(0, bar);
+        layer.go(bar, party).on_trigger(2).blend_ms(150);
+        layer.go(party, bar).after_ms(800);
+        d.state_machines.push(StateMachine {
+            name: "Loading".into(),
+            inputs: vec![
+                Input { name: "progress".into(), kind: InputKind::Number, value: 0.0 },
+                Input { name: "hover".into(), kind: InputKind::Bool, value: 0.0 },
+                Input { name: "done".into(), kind: InputKind::Trigger, value: 0.0 },
+            ],
+            layers: vec![layer],
+            listeners: vec![Listener { target: 1, event: Pointer::Enter, actions: vec![Action::SetBool { input: 1, value: true }, Action::FireEvent { event: 0 }] }],
+        });
+        let file = vectro_riv::read(&d.export_riv(), &Schema::bundled()).expect("valid .riv");
+        let names: Vec<&str> = file.objects.iter().filter_map(|o| o.type_name.as_deref()).collect();
+        let order = ["Event", "StateMachine", "StateMachineNumber", "StateMachineBool", "StateMachineTrigger", "StateMachineLayer",
+            "EntryState", "StateTransition", "AnyState", "ExitState", "BlendState1DInput", "BlendAnimation1D", "BlendAnimation1D",
+            "StateTransition", "TransitionTriggerCondition", "AnimationState", "StateTransition", "StateMachineListenerSingle",
+            "ListenerBoolChange", "ListenerFireEvent"];
+        let mut pos = 0;
+        for want in order {
+            pos = names[pos..].iter().position(|n| *n == want).map(|p| p + pos + 1).unwrap_or_else(|| panic!("{want} missing or out of order"));
+        }
+        assert_eq!(names.iter().filter(|n| **n == "StateMachine").count(), 1, "no default machine when one is given");
     }
 
     #[test]
