@@ -35,7 +35,7 @@ new minor version.
 
 ## What a real file holds
 
-`seller.riv` (4.9 KB, format 7.0) decodes to 502 objects:
+A 4.9 KB file exported by the Rive editor (format 7.0) decodes to 502 objects:
 
 - 1 artboard (1000 x 1000) holding a boned character: 6 root bones, 5 tendons, 5 weights, 6 shapes built from 7 paths
 - 8 linear animations, 40 keyed objects, 104 keyed properties, 220 keyframes, 10 cubic easings
