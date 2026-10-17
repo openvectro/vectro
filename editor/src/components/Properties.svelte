@@ -159,6 +159,32 @@
         </div>
       {/if}
     {/if}
+    {#if shape.kind !== "path"}
+      {@const paths = editor.doc.shapes.filter((x) => x.kind === "path" && x.id !== real.id)}
+      <div class="panel-title">Motion path</div>
+      <div class="grid">
+        <label for="p-follow">Path</label>
+        <select id="p-follow" value={real.follow?.path ?? ""}
+          onchange={(e) => editor.setFollow(real.id, e.currentTarget.value === "" ? null : Number(e.currentTarget.value))}>
+          <option value="">None</option>
+          {#each paths as p (p.id)}<option value={p.id}>{p.name}</option>{/each}
+        </select><span></span>
+        {#if real.follow}
+          <label for="p-fdist">Distance</label>
+          <input id="p-fdist" type="number" step="0.01" min="0" max="1" value={+(shape.follow?.distance ?? 0).toFixed(3)}
+            onchange={(e) => editor.setProp(shape.id, "followDistance", num(e))} />
+          {#if animating}
+            <button class="key" class:on={!!editor.keyAtPlayhead(shape.id, "followDistance")} class:has={!!editor.track(shape.id, "followDistance")}
+              onclick={() => editor.toggleKey(shape.id, "followDistance")} title="Key at playhead">◆</button>
+          {:else}<span></span>{/if}
+          <label for="p-orient">Orient</label>
+          <input id="p-orient" type="checkbox" checked={!!real.follow.orient} onchange={(e) => editor.setFollowFlag(real.id, "orient", e.currentTarget.checked)} /><span></span>
+          <label for="p-offset">Offset</label>
+          <input id="p-offset" type="checkbox" checked={!!real.follow.offset} onchange={(e) => editor.setFollowFlag(real.id, "offset", e.currentTarget.checked)} /><span></span>
+        {/if}
+      </div>
+      {#if real.follow}<p class="hint">The path sets the position{real.follow.offset ? "; X and Y shift it" : "; X and Y are ignored unless Offset is on"}. Orient turns the shape along the path.</p>{/if}
+    {/if}
     <div class="panel-title">Pivot</div>
     <div class="grid">
       {#if shape.kind === "rectangle" || shape.kind === "ellipse"}

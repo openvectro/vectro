@@ -9,7 +9,11 @@ export type ShapeProp =
 export type PointProp = "pointX" | "pointY" | "inAngle" | "inLength" | "outAngle" | "outLength";
 /** The last stop of a gradient fill; "fill" is the first stop or the flat colour. */
 export type PaintProp = "fillEnd";
-export type Prop = ShapeProp | PointProp | PaintProp;
+/** How far along its motion path a following shape sits, 0..1 (`Shape.follow.distance`). */
+export type FollowProp = "followDistance";
+/** What the Properties panel can key: a shape's own values plus its motion path distance. */
+export type KeyProp = ShapeProp | FollowProp;
+export type Prop = ShapeProp | PointProp | PaintProp | FollowProp;
 export type Ease =
   | { type: "hold" }
   | { type: "linear" }
@@ -39,7 +43,15 @@ export interface Shape {
   gradient?: { kind: "linear" | "radial"; start: [number, number]; end: [number, number]; stops: { position: number; color: number }[] };
   stroke?: { color: number; thickness: number; cap?: number; join?: number };
   feather?: { strength: number; offset?: [number, number]; inner?: boolean };
+  /** A motion path: the shape sits `distance` (0..1) along path shape `path`; its own x/y count only when `offset` is on. */
+  follow?: { path: number; distance: number; orient?: boolean; offset?: boolean };
 }
+
+/** The value of a keyable property as a shape shows it. */
+export const keyValue = (s: Shape, prop: KeyProp): number => (prop === "followDistance" ? (s.follow?.distance ?? 0) : s[prop]);
+
+/** The label a property gets on the timeline and in the panel. */
+export const propLabel = (prop: string) => (prop === "followDistance" ? "Path distance" : (PROPS.find((p) => p.prop === prop)?.label ?? prop));
 
 /** SVG paint for a shape: a gradient reference or the flat colour. */
 export const paintOf = (s: Shape) => (s.gradient ? `url(#grad-${s.id})` : argbToCss(s.fill));
