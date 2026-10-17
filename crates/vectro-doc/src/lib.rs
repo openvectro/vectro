@@ -57,6 +57,10 @@ fn one() -> f32 {
     1.0
 }
 
+fn half() -> f32 {
+    0.5
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct State {
@@ -305,6 +309,11 @@ pub struct Shape {
     /// The group this shape sits in; its x/y are then in the group's space.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent: Option<u32>,
+    /// Where a rectangle's or ellipse's origin sits in its box, 0..1 each way (0.5 is the centre).
+    #[serde(default = "half")]
+    pub origin_x: f32,
+    #[serde(default = "half")]
+    pub origin_y: f32,
     /// Replaces the flat `fill` when set. Coordinates are in the shape's own space.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub gradient: Option<Gradient>,
@@ -394,6 +403,8 @@ impl Shape {
             paths: Vec::new(),
             fill_rule: FillRule::NonZero,
             parent: None,
+            origin_x: 0.5,
+            origin_y: 0.5,
             gradient: None,
             stroke: None,
             feather: None,
@@ -882,6 +893,8 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                     ("parentId", Uint(shape)),
                     ("width", Double(s.width)),
                     ("height", Double(s.height)),
+                    ("originX", Double(s.origin_x)),
+                    ("originY", Double(s.origin_y)),
                     ("cornerRadiusTL", Double(r)),
                     ("cornerRadiusTR", Double(r)),
                     ("cornerRadiusBL", Double(r)),
@@ -892,6 +905,8 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ("parentId", Uint(shape)),
                 ("width", Double(s.width)),
                 ("height", Double(s.height)),
+                ("originX", Double(s.origin_x)),
+                ("originY", Double(s.origin_y)),
             ])),
             ShapeKind::Group => unreachable!("groups are placed above"),
             ShapeKind::Path => {

@@ -33,6 +33,9 @@ export interface Shape {
   paths?: SubPath[];
   fillRule?: "nonZero" | "evenOdd";
   parent?: number;
+  /** Where the origin sits in a rectangle's or ellipse's box, 0..1 (0.5 is the centre). */
+  originX?: number;
+  originY?: number;
   gradient?: { kind: "linear" | "radial"; start: [number, number]; end: [number, number]; stops: { position: number; color: number }[] };
   stroke?: { color: number; thickness: number; cap?: number; join?: number };
   feather?: { strength: number; offset?: [number, number]; inner?: boolean };
@@ -89,7 +92,7 @@ export function pathData(s: Shape): string {
 
 /** Bounds of what a shape draws, relative to its origin (before rotation and scale). */
 export function localBounds(s: Shape): { x: number; y: number; w: number; h: number } {
-  if (s.kind !== "path" || !s.paths?.length) return { x: -s.width / 2, y: -s.height / 2, w: s.width, h: s.height };
+  if (s.kind !== "path" || !s.paths?.length) return { x: -s.width * (s.originX ?? 0.5), y: -s.height * (s.originY ?? 0.5), w: s.width, h: s.height };
   let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
   for (const v of s.paths.flatMap((p) => p.points)) {
     for (const [x, y] of [[v.x, v.y], [v.inX, v.inY], [v.outX, v.outY]]) {

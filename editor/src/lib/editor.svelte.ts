@@ -1,11 +1,12 @@
 import * as core from "../wasm/vectro_wasm.js";
 import {
   EASES, ancestors, localBounds, worldMatrix,
-  type Doc, type Ease, type ShapeProp as Prop, type Shape, type ShapeKind, type Track, type Vertex,
+  type Doc, type Ease, type Prop as AnyProp, type ShapeProp as Prop, type Shape, type ShapeKind, type Track, type Vertex,
 } from "./types";
 
 const STORAGE = "vectro.document";
-export type Tool = "select" | "rectangle" | "ellipse" | "pen" | "node";
+export type Tool = "select" | "rectangle" | "ellipse" | "pen" | "node" | "pivot";
+export type KeyRef = { track: number; key: number };
 export type Mode = "design" | "animate";
 export type Align = "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom";
 
@@ -30,7 +31,13 @@ class Editor {
   anim = $state(0);
   frame = $state(0);
   playing = $state(false);
-  selectedKey = $state<{ track: number; key: number } | null>(null);
+  /** Keys picked on the timeline; the last one is the primary. */
+  selectedKeys = $state<KeyRef[]>([]);
+  /** Keys copied with ⌘C: track identity plus frames relative to the earliest. */
+  keyClipboard: { shapeId: number; prop: AnyProp; point?: Track["point"]; keys: { frame: number; value: number; ease: Ease }[] }[] = [];
+  /** Ghosts of nearby frames on the canvas while animating. */
+  onion = $state(false);
+  onionStep = $state(6);
   error = $state<string | null>(null);
   /** The viewport: zoom factor and the artboard point at the top-left of the padding. */
   view = $state({ zoom: 1, x: 0, y: 0 });
@@ -54,6 +61,18 @@ class Editor {
       return this.doc.shapes;
     }
   });
+
+  get selectedKey(): KeyRef | null {
+    return this.selectedKeys.length ? this.selectedKeys[this.selectedKeys.length - 1] : null;
+  }
+
+  set selectedKey(k: KeyRef | null) {
+    this.selectedKeys = k ? [k] : [];
+  }
+
+  isKeySelected(track: number, key: number) {
+    return this.selectedKeys.some((k) => k.track === track && k.key === key);
+  }
 
   get selected(): number | null {
     return this.selectedIds.length ? this.selectedIds[this.selectedIds.length - 1] : null;
@@ -89,6 +108,11 @@ class Editor {
     this.future = [];
   }
 
+  /** Fold the last checkpoint into the one before it (a drag that calls setPivot per move). */
+  undoMerge() {
+    if (this.past.length >= 2) this.past.splice(this.past.length - 1, 1);
+  }
+
   undo() {
     const prev = this.past.pop();
     if (!prev) return;
@@ -109,7 +133,7 @@ class Editor {
     this.selectedIds = this.selectedIds.filter((id) => this.doc.shapes.some((s) => s.id === id));
     this.selectedVertex = null;
     this.anim = Math.min(this.anim, this.doc.animations.length - 1);
-    this.selectedKey = null;
+    this.selectedKeys = [];
     this.machine = Math.max(0, Math.min(this.machine, (this.doc.stateMachines?.length ?? 1) - 1));
     this.layer = Math.max(0, Math.min(this.layer, (this.doc.stateMachines?.[this.machine]?.layers.length ?? 1) - 1));
     this.smSelection = null;
@@ -452,13 +476,137 @@ class Editor {
   }
 
   deleteSelectedKey() {
-    const sk = this.selectedKey;
-    if (!sk) return;
+    this.deleteSelectedKeys();
+  }
+
+  deleteSelectedKeys() {
+    if (!this.selectedKeys.length || !this.animation) return;
     this.checkpoint();
-    const t = this.animation.tracks[sk.track];
-    t.keys.splice(sk.key, 1);
-    if (!t.keys.length) this.animation.tracks.splice(sk.track, 1);
-    this.selectedKey = null;
+    const a = this.animation;
+    // Highest key index first within each track, so earlier indices stay valid.
+    const byTrack = new Map<number, number[]>();
+    for (const k of this.selectedKeys) byTrack.set(k.track, [...(byTrack.get(k.track) ?? []), k.key]);
+    for (const [ti, keys] of byTrack) for (const ki of [...new Set(keys)].sort((x, y) => y - x)) a.tracks[ti]?.keys.splice(ki, 1);
+    a.tracks = a.tracks.filter((t) => t.keys.length);
+    this.selectedKeys = [];
+  }
+
+  /** Move every selected key by `delta` frames, keeping order and refusing collisions. */
+  moveSelectedKeys(delta: number) {
+    if (!delta || !this.animation) return false;
+    const a = this.animation;
+    const groups = new Map<number, Set<number>>();
+    for (const k of this.selectedKeys) groups.set(k.track, (groups.get(k.track) ?? new Set()).add(k.key));
+    for (const [ti, kis] of groups) {
+      const t = a.tracks[ti];
+      if (!t) continue;
+      for (const ki of kis) {
+        const f = t.keys[ki].frame + delta;
+        if (f < 0 || f > a.duration) return false;
+        if (t.keys.some((o, i) => !kis.has(i) && o.frame === f)) return false;
+      }
+    }
+    const moved: KeyRef[] = [];
+    for (const [ti, kis] of groups) {
+      const t = a.tracks[ti];
+      if (!t) continue;
+      const chosen = [...kis].map((ki) => t.keys[ki]);
+      for (const k of chosen) k.frame += delta;
+      t.keys.sort((x, y) => x.frame - y.frame);
+      for (const k of chosen) moved.push({ track: ti, key: t.keys.indexOf(k) });
+    }
+    this.selectedKeys = moved;
+    return true;
+  }
+
+  /** Apply an easing to every selected key. */
+  setSelectedEase(ease: Ease) {
+    if (!this.selectedKeys.length || !this.animation) return;
+    this.checkpoint();
+    for (const k of this.selectedKeys) {
+      const key = this.animation.tracks[k.track]?.keys[k.key];
+      if (key) key.ease = { ...ease };
+    }
+  }
+
+  copyKeys() {
+    if (!this.selectedKeys.length || !this.animation) return 0;
+    const a = this.animation;
+    const first = Math.min(...this.selectedKeys.map((k) => a.tracks[k.track]?.keys[k.key]?.frame ?? Infinity));
+    const byTrack = new Map<number, number[]>();
+    for (const k of this.selectedKeys) byTrack.set(k.track, [...(byTrack.get(k.track) ?? []), k.key]);
+    this.keyClipboard = [...byTrack].map(([ti, kis]) => {
+      const t = a.tracks[ti];
+      return { shapeId: t.shapeId, prop: t.prop, point: t.point, keys: [...new Set(kis)].map((ki) => ({ ...t.keys[ki], ease: { ...t.keys[ki].ease } as Ease, frame: t.keys[ki].frame - first })) };
+    });
+    return this.selectedKeys.length;
+  }
+
+  /** Paste copied keys so the earliest lands on the playhead; same shapes and properties. */
+  pasteKeys() {
+    if (!this.keyClipboard.length || !this.animation) return 0;
+    this.checkpoint();
+    const a = this.animation;
+    const at = Math.round(this.frame);
+    const pasted: KeyRef[] = [];
+    for (const c of this.keyClipboard) {
+      let t = a.tracks.find((t) => t.shapeId === c.shapeId && t.prop === c.prop && JSON.stringify(t.point) === JSON.stringify(c.point));
+      if (!t) {
+        a.tracks.push({ shapeId: c.shapeId, prop: c.prop, ...(c.point ? { point: c.point } : {}), keys: [] });
+        t = a.tracks[a.tracks.length - 1];
+      }
+      for (const k of c.keys) {
+        const frame = Math.min(a.duration, at + k.frame);
+        const existing = t.keys.find((o) => o.frame === frame);
+        if (existing) Object.assign(existing, { value: k.value, ease: { ...k.ease } });
+        else t.keys.push({ frame, value: k.value, ease: { ...k.ease } as Ease });
+      }
+      t.keys.sort((x, y) => x.frame - y.frame);
+      const ti = a.tracks.indexOf(t);
+      for (const k of c.keys) pasted.push({ track: ti, key: t.keys.findIndex((o) => o.frame === Math.min(a.duration, at + k.frame)) });
+    }
+    this.selectedKeys = pasted;
+    return pasted.length;
+  }
+
+  /** The frames that carry a key on any track of a shape (for the dope sheet's summary row). */
+  keyFramesOf(shapeId: number): number[] {
+    const set = new Set<number>();
+    for (const t of this.animation?.tracks ?? []) if (t.shapeId === shapeId) for (const k of t.keys) set.add(k.frame);
+    return [...set].sort((x, y) => x - y);
+  }
+
+  /** Select every key of a shape at one frame. */
+  selectKeysAt(shapeId: number, frame: number, add = false) {
+    const a = this.animation;
+    if (!a) return;
+    const hits: KeyRef[] = [];
+    a.tracks.forEach((t, ti) => { if (t.shapeId === shapeId) t.keys.forEach((k, ki) => { if (k.frame === frame) hits.push({ track: ti, key: ki }); }); });
+    this.selectedKeys = add ? [...this.selectedKeys, ...hits] : hits;
+  }
+
+  /**
+   * Move a shape's pivot to a new point in its own space without moving what it draws.
+   * Rectangles and ellipses keep an origin fraction; paths shift their points; groups shift their children.
+   */
+  setPivot(id: number, lx: number, ly: number) {
+    const s = this.shape(id);
+    if (!s) return;
+    this.checkpoint();
+    // Keep the shape where it is: the old origin moves by (lx, ly) in local space, so the
+    // shape's own position moves by that offset after the local rotation and scale.
+    const rot = (s.rotation * Math.PI) / 180;
+    const dx = lx * s.scaleX, dy = ly * s.scaleY;
+    s.x = Math.round((s.x + dx * Math.cos(rot) - dy * Math.sin(rot)) * 100) / 100;
+    s.y = Math.round((s.y + dx * Math.sin(rot) + dy * Math.cos(rot)) * 100) / 100;
+    if (s.kind === "rectangle" || s.kind === "ellipse") {
+      s.originX = Math.round(((s.originX ?? 0.5) + lx / s.width) * 1000) / 1000;
+      s.originY = Math.round(((s.originY ?? 0.5) + ly / s.height) * 1000) / 1000;
+    } else if (s.kind === "path") {
+      for (const v of s.paths?.flatMap((p) => p.points) ?? []) { v.x -= lx; v.inX -= lx; v.outX -= lx; v.y -= ly; v.inY -= ly; v.outY -= ly; }
+    } else {
+      for (const c of this.doc.shapes) if (c.parent === id) { c.x -= lx; c.y -= ly; }
+    }
   }
 
   addAnimation() {

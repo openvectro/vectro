@@ -159,6 +159,18 @@
         </div>
       {/if}
     {/if}
+    <div class="panel-title">Pivot</div>
+    <div class="grid">
+      {#if shape.kind === "rectangle" || shape.kind === "ellipse"}
+        <label>Origin</label>
+        <div class="pair">
+          <input type="number" step="0.05" value={real.originX ?? 0.5} title="0 left, 0.5 centre, 1 right" onchange={(e) => edit(() => (real.originX = num(e)))} />
+          <input type="number" step="0.05" value={real.originY ?? 0.5} title="0 top, 0.5 centre, 1 bottom" onchange={(e) => edit(() => (real.originY = num(e)))} />
+        </div><span></span>
+      {/if}
+      <span></span>
+      <button class="small" class:active={editor.tool === "pivot"} onclick={() => (editor.tool = editor.tool === "pivot" ? "select" : "pivot")} title="Drag the pivot on the canvas (O)">{editor.tool === "pivot" ? "Done" : "Move pivot"}</button><span></span>
+    </div>
     <p class="hint">
       {animating ? "Changes above set a key at the playhead." : "Switch to Animate to key these over time."}
     </p>

@@ -4,6 +4,7 @@
     ancestors, argbToCss, featherStyle, isRoot, localBounds, paintOf, pathData, strokeAttrs, transformOf, worldMatrix,
     type Shape, type Vertex,
   } from "../lib/types";
+  import * as core from "../wasm/vectro_wasm.js";
 
   let svg: SVGSVGElement;
   const pad = 60;
@@ -41,7 +42,8 @@
     | { kind: "box"; x0: number; y0: number; x1: number; y1: number; add: boolean }
     | { kind: "pan"; x0: number; y0: number; vx: number; vy: number }
     | { kind: "pen"; id: number; index: number }
-    | { kind: "vertex"; id: number; path: number; index: number; what: "point" | "in" | "out"; alt: boolean };
+    | { kind: "vertex"; id: number; path: number; index: number; what: "point" | "in" | "out"; alt: boolean }
+    | { kind: "pivot"; id: number };
   let drag = $state<Drag | null>(null);
   let cursor = $state<{ x: number; y: number } | null>(null);
   let spaceDown = $state(false);
@@ -108,6 +110,12 @@
       if (target && Number(target.getAttribute("data-id")) === nodeShape.id) return;
       // Clicking elsewhere leaves node editing.
       editor.tool = "select";
+    }
+
+    if (editor.tool === "pivot" && editor.selectedShape) {
+      if (editor.mode === "animate") editor.mode = "design";
+      drag = { kind: "pivot", id: editor.selectedShape.id };
+      return;
     }
 
     if (editor.tool === "rectangle" || editor.tool === "ellipse") {
@@ -194,6 +202,13 @@
       const v = s.paths![0].points[drag.index];
       v.outX = p.x; v.outY = p.y;
       v.inX = 2 * v.x - p.x; v.inY = 2 * v.y - p.y;
+    } else if (drag.kind === "pivot") {
+      // The pivot follows the pointer; the shape stays put on screen.
+      const id = drag.id;
+      const s = editor.shown.find((x) => x.id === id)!;
+      const lp = toLocal(s, p);
+      editor.setPivot(id, Math.round(lp.x), Math.round(lp.y));
+      editor.undoMerge();
     } else if (drag.kind === "vertex") {
       const id = drag.id;
       const s = editor.shape(id)!;
@@ -323,7 +338,23 @@
   }
 
   const transform = transformOf;
+  const ox = (s: Shape) => -s.width * (s.originX ?? 0.5);
+  const oy = (s: Shape) => -s.height * (s.originY ?? 0.5);
   const roots = $derived(editor.shown.filter((s) => isRoot(editor.shown, s)));
+
+  /** Ghosts of the frames either side of the playhead, when onion skin is on. */
+  const ghosts = $derived.by<{ shapes: Shape[]; colour: string }[]>(() => {
+    if (!editor.onion || editor.mode !== "animate" || !editor.animation) return [];
+    const json = JSON.stringify(editor.doc);
+    const out: { shapes: Shape[]; colour: string }[] = [];
+    for (const [d, colour] of [[-editor.onionStep, "#ff6b6b"], [editor.onionStep, "#51cf66"]] as const) {
+      const f = editor.frame + d;
+      if (f < 0 || f > editor.animation.duration) continue;
+      try { out.push({ shapes: JSON.parse(core.evaluate(json, editor.anim, f)), colour }); } catch {}
+    }
+    return out;
+  });
+  const ghostChain = (shapes: Shape[], s: Shape) => [...ancestors(shapes, s), s].map(transformOf).join(" ");
   const childrenOf = (id: number) => editor.shown.filter((c) => c.parent === id);
   const chain = (s: Shape) => [...ancestors(editor.shown, s), s].map(transformOf).join(" ");
   const selectedShapes = $derived(editor.shown.filter((s) => editor.selectedIds.includes(s.id)));
@@ -331,7 +362,7 @@
 
 <svelte:window onkeydown={key} onkeyup={key} />
 
-<div class="stage" class:creating={editor.tool === "rectangle" || editor.tool === "ellipse"} class:pen={editor.tool === "pen"} class:panning={spaceDown}>
+<div class="stage" class:creating={editor.tool === "rectangle" || editor.tool === "ellipse"} class:pen={editor.tool === "pen"} class:pivoting={editor.tool === "pivot"} class:panning={spaceDown}>
   <svg
     bind:this={svg}
     {viewBox}
@@ -368,10 +399,10 @@
           {#if s.kind === "group"}
             {#each childrenOf(s.id) as c (c.id)}{@render node(c)}{/each}
           {:else if s.kind === "rectangle"}
-            <rect x={-s.width / 2} y={-s.height / 2} width={s.width} height={s.height}
+            <rect x={ox(s)} y={oy(s)} width={s.width} height={s.height}
               rx={Math.min(s.cornerRadius, s.width / 2, s.height / 2)} fill={paintOf(s)} {...strokeAttrs(s)} />
           {:else if s.kind === "ellipse"}
-            <ellipse rx={s.width / 2} ry={s.height / 2} fill={paintOf(s)} {...strokeAttrs(s)} />
+            <ellipse cx={ox(s) + s.width / 2} cy={oy(s) + s.height / 2} rx={s.width / 2} ry={s.height / 2} fill={paintOf(s)} {...strokeAttrs(s)} />
           {:else}
             <path d={pathData(s)} fill={paintOf(s)} fill-rule={s.fillRule === "evenOdd" ? "evenodd" : "nonzero"} {...strokeAttrs(s)}
               stroke={s.stroke ? argbToCss(s.stroke.color) : s.paths?.[0]?.closed === false && !s.stroke ? "#888" : undefined}
@@ -381,6 +412,23 @@
       {/snippet}
       {#each roots as s (s.id)}{@render node(s)}{/each}
     </g>
+
+    <!-- Onion skin: outlines of the frames either side of the playhead -->
+    {#each ghosts as g}
+      <g class="ghost" style="color: {g.colour}">
+        {#each g.shapes.filter((s) => s.kind !== "group") as s (s.id)}
+          <g transform={ghostChain(g.shapes, s)} opacity={0.6 * s.opacity}>
+            {#if s.kind === "rectangle"}
+              <rect x={ox(s)} y={oy(s)} width={s.width} height={s.height} rx={Math.min(s.cornerRadius, s.width / 2, s.height / 2)} vector-effect="non-scaling-stroke" />
+            {:else if s.kind === "ellipse"}
+              <ellipse cx={ox(s) + s.width / 2} cy={oy(s) + s.height / 2} rx={s.width / 2} ry={s.height / 2} vector-effect="non-scaling-stroke" />
+            {:else}
+              <path d={pathData(s)} vector-effect="non-scaling-stroke" />
+            {/if}
+          </g>
+        {/each}
+      </g>
+    {/each}
 
     <!-- Selection outlines -->
     {#if editor.tool !== "node" && !penShape}
@@ -397,6 +445,17 @@
           {/if}
         </g>
       {/each}
+    {/if}
+
+    <!-- The pivot, while the pivot tool is on -->
+    {#if editor.tool === "pivot" && editor.selectedShape}
+      {@const s = editor.shown.find((x) => x.id === editor.selected)}
+      {#if s}
+        <g transform={chain(s)} class="pivot">
+          <circle r={9 * px} vector-effect="non-scaling-stroke" />
+          <path d="M{-14 * px} 0H{14 * px}M0 {-14 * px}V{14 * px}" vector-effect="non-scaling-stroke" />
+        </g>
+      {/if}
     {/if}
 
     <!-- Point editing -->
@@ -433,6 +492,7 @@
     {#if editor.mode === "animate"}<span class="badge">Animate · frame {Math.round(editor.frame)}</span>{/if}
     {#if editor.tool === "pen"}<span class="tip">Click to add points, drag for curves, click the first point to close, Enter to finish</span>{/if}
     {#if editor.tool === "node"}<span class="tip">Drag points and handles · Alt breaks a handle pair · double-click the outline to add a point · ⌫ removes one</span>{/if}
+    {#if editor.tool === "pivot"}<span class="tip">Drag anywhere to put the pivot there; the shape stays where it is. Rotation and scale turn about the pivot.</span>{/if}
     <span class="zoom">{Math.round(view.zoom * 100)}%</span>
   </div>
 </div>
@@ -456,6 +516,10 @@
   .nodes .vertex.sel { fill: var(--accent); }
   .nodes .vertex.first { stroke: var(--key); }
   .box { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; pointer-events: none; }
+  .ghost * { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-dasharray: 4 3; pointer-events: none; }
+  .pivot circle { fill: var(--key); stroke: #000; stroke-width: 1; pointer-events: none; }
+  .pivot path { stroke: var(--key); stroke-width: 1.5; pointer-events: none; }
+  .stage.pivoting svg { cursor: crosshair; }
   .hud { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; gap: 8px; align-items: center; pointer-events: none; }
   .badge { background: var(--key); color: #000; padding: 2px 10px; border-radius: 99px; font-weight: 600; font-size: 12px; }
   .tip { color: var(--muted); font-size: 12px; background: var(--panel); padding: 2px 10px; border-radius: 99px; border: 1px solid var(--line); }

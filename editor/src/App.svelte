@@ -42,6 +42,8 @@
     const k = e.key.toLowerCase();
     if (mod && k === "g") { e.preventDefault(); e.shiftKey ? editor.ungroup() : editor.group(); return; }
     if (mod && k === "d") { e.preventDefault(); editor.duplicate(); return; }
+    if (mod && k === "c" && editor.selectedKeys.length) { e.preventDefault(); editor.copyKeys(); return; }
+    if (mod && k === "v" && editor.keyClipboard.length) { e.preventDefault(); editor.pasteKeys(); return; }
     if (mod && k === "a") { e.preventDefault(); editor.selectedIds = editor.doc.shapes.filter((s) => !s.parent).map((s) => s.id); return; }
     if (mod && (k === "=" || k === "+")) { e.preventDefault(); editor.zoomAt(1.25, editor.doc.artboard.width / 2, editor.doc.artboard.height / 2); return; }
     if (mod && k === "-") { e.preventDefault(); editor.zoomAt(0.8, editor.doc.artboard.width / 2, editor.doc.artboard.height / 2); return; }
@@ -52,6 +54,7 @@
     else if (k === "e") editor.tool = "ellipse";
     else if (k === "p") editor.tool = "pen";
     else if (k === "n") editor.tool = "node";
+    else if (k === "o") editor.tool = editor.tool === "pivot" ? "select" : "pivot";
     else if (k === " ") {
       e.preventDefault();
       if (editor.tool === "pen") return;
@@ -59,12 +62,12 @@
     } else if (k === "enter") {
       if (editor.tool === "pen") canvas.finishPen();
     } else if (k === "backspace" || k === "delete") {
-      if (editor.selectedKey) editor.deleteSelectedKey();
+      if (editor.selectedKeys.length) editor.deleteSelectedKeys();
       else if (editor.tool === "node" && editor.selectedVertex) canvas.deleteVertex();
       else if (editor.selectedIds.length) editor.deleteSelection();
     } else if (k === "escape") {
       if (editor.tool === "pen") canvas.finishPen();
-      else if (editor.tool === "node") editor.tool = "select";
+      else if (editor.tool === "node" || editor.tool === "pivot") editor.tool = "select";
       else {
         editor.selected = null;
         editor.selectedKey = null;
