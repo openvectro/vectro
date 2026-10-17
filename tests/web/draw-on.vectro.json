@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "artboard": {
+    "name": "Draw on",
+    "width": 300.0,
+    "height": 200.0,
+    "background": 4280163876
+  },
+  "shapes": [
+    {
+      "id": 1,
+      "name": "line",
+      "kind": "path",
+      "x": 150.0,
+      "y": 100.0,
+      "width": 0.0,
+      "height": 0.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 0,
+      "paths": [
+        {
+          "closed": false,
+          "points": [
+            {
+              "x": -130.0,
+              "y": 0.0,
+              "inX": -130.0,
+              "inY": 0.0,
+              "outX": -60.0,
+              "outY": -90.0
+            },
+            {
+              "x": 130.0,
+              "y": 0.0,
+              "inX": 60.0,
+              "inY": 90.0,
+              "outX": 130.0,
+              "outY": 0.0
+            }
+          ]
+        }
+      ],
+      "fillRule": "nonZero",
+      "originX": 0.5,
+      "originY": 0.5,
+      "stroke": {
+        "color": 4294953015,
+        "thickness": 10.0,
+        "cap": 1,
+        "join": 1,
+        "trim": {
+          "start": 0.0,
+          "end": 0.0,
+          "offset": 0.0,
+          "mode": "sequential"
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "name": "Draw",
+      "fps": 60,
+      "duration": 60,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 1,
+          "prop": "trimEnd",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "cubic",
+                "x1": 0.42,
+                "y1": 0.0,
+                "x2": 0.58,
+                "y2": 1.0
+              }
+            },
+            {
+              "frame": 60,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

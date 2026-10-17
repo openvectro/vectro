@@ -371,6 +371,38 @@ pub struct Stroke {
     /// 0 miter, 1 round, 2 bevel
     #[serde(default)]
     pub join: u8,
+    /// Draw-on: only the part of the outline between `start` and `end` is stroked.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trim: Option<Trim>,
+}
+
+/// How a trim treats a shape with several outlines: one after another along their summed
+/// length, or every outline trimmed by the same fractions at once.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[serde(rename_all = "camelCase")]
+pub enum TrimMode {
+    #[default]
+    Sequential,
+    Synchronized,
+}
+
+/// Rive's trim path on a stroke: `start` and `end` are fractions of the outline's length
+/// (0..1), `offset` slides both along it (also a fraction, wrapping).
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Trim {
+    pub start: f32,
+    pub end: f32,
+    #[serde(default)]
+    pub offset: f32,
+    #[serde(default)]
+    pub mode: TrimMode,
+}
+
+impl Default for Trim {
+    fn default() -> Self {
+        Trim { start: 0.0, end: 1.0, offset: 0.0, mode: TrimMode::Sequential }
+    }
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
@@ -417,7 +449,15 @@ impl Shape {
     }
 
     pub fn stroke(mut self, color: u32, thickness: f32) -> Self {
-        self.stroke = Some(Stroke { color, thickness, cap: 1, join: 1 });
+        self.stroke = Some(Stroke { color, thickness, cap: 1, join: 1, trim: None });
+        self
+    }
+
+    /// Draw-on: stroke only the part of the outline from `start` to `end` (fractions, 0..1).
+    /// Key `Prop::TrimEnd` from 0 to 1 and the line draws itself.
+    pub fn trim(mut self, start: f32, end: f32) -> Self {
+        let st = self.stroke.get_or_insert(Stroke { color: 0xffffffff, thickness: 2.0, cap: 1, join: 1, trim: None });
+        st.trim = Some(Trim { start, end, ..Trim::default() });
         self
     }
 
@@ -485,6 +525,10 @@ pub enum Prop {
     Fill,
     /// The last stop of a gradient fill (Fill is the first stop, or the flat colour).
     FillEnd,
+    /// The stroke's trim (draw-on): start, end and offset as fractions of the outline.
+    TrimStart,
+    TrimEnd,
+    TrimOffset,
     /// Point animation, for tracks with a `point`: its position, and its curve handles as an
     /// angle (degrees) and a length, the way Rive stores them.
     PointX,
@@ -498,6 +542,10 @@ pub enum Prop {
 impl Prop {
     pub fn is_point(self) -> bool {
         matches!(self, Prop::PointX | Prop::PointY | Prop::InAngle | Prop::InLength | Prop::OutAngle | Prop::OutLength)
+    }
+
+    pub fn is_trim(self) -> bool {
+        matches!(self, Prop::TrimStart | Prop::TrimEnd | Prop::TrimOffset)
     }
 
     pub const ALL: [Prop; 10] = [
@@ -526,6 +574,9 @@ impl Prop {
             Prop::CornerRadius => s.corner_radius as f64,
             Prop::Fill => s.gradient.as_ref().and_then(|g| g.stops.first()).map_or(s.fill, |st| st.color) as f64,
             Prop::FillEnd => s.gradient.as_ref().and_then(|g| g.stops.last()).map_or(s.fill, |st| st.color) as f64,
+            Prop::TrimStart => s.stroke.and_then(|st| st.trim).map_or(0.0, |t| t.start) as f64,
+            Prop::TrimEnd => s.stroke.and_then(|st| st.trim).map_or(1.0, |t| t.end) as f64,
+            Prop::TrimOffset => s.stroke.and_then(|st| st.trim).map_or(0.0, |t| t.offset) as f64,
             _ => 0.0,
         }
     }
@@ -549,6 +600,16 @@ impl Prop {
                 Some(st) => st.color = v as u32,
                 None => s.fill = v as u32,
             },
+            // A trim key only moves an existing trim; without "draw on" the stroke stays whole.
+            Prop::TrimStart | Prop::TrimEnd | Prop::TrimOffset => {
+                if let Some(t) = s.stroke.as_mut().and_then(|st| st.trim.as_mut()) {
+                    match self {
+                        Prop::TrimStart => t.start = v as f32,
+                        Prop::TrimEnd => t.end = v as f32,
+                        _ => t.offset = v as f32,
+                    }
+                }
+            }
             _ => {}
         }
     }
@@ -819,6 +880,8 @@ struct Placed {
     /// The component holding the fill colour, and its type (SolidColor or GradientStop).
     colour: Option<(u64, &'static str)>,
     colour_end: Option<(u64, &'static str)>,
+    /// The stroke's TrimPath, when the stroke draws on.
+    trim: Option<u64>,
 }
 
 fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
@@ -870,7 +933,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ("scaleY", Double(s.scale_y)),
                 ("opacity", Double(s.opacity)),
             ]));
-            placed.push((s.id, s.kind, Placed { shape: node, path: None, colour: None, colour_end: None }));
+            placed.push((s.id, s.kind, Placed { shape: node, path: None, colour: None, colour_end: None, trim: None }));
             for c in doc.shapes.iter().filter(|c| c.parent == Some(s.id)) {
                 stack.push((c.id, node));
             }
@@ -974,6 +1037,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ("inner", Value::Bool(f.inner)),
             ]));
         }
+        let mut trim = None;
         if let Some(st) = &s.stroke {
             let sid = comp(b.add("Stroke", &[
                 ("parentId", Uint(shape)),
@@ -982,8 +1046,22 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ("join", Uint(st.join as u64)),
             ]));
             comp(b.add("SolidColor", &[("parentId", Uint(sid)), ("colorValue", Color(st.color))]));
+            if let Some(t) = &st.trim {
+                // TrimPath under the Stroke; modeValue 0 is off, 1 sequential, 2 synchronized.
+                let mode = match t.mode {
+                    TrimMode::Sequential => 1,
+                    TrimMode::Synchronized => 2,
+                };
+                trim = Some(comp(b.add("TrimPath", &[
+                    ("parentId", Uint(sid)),
+                    ("start", Double(t.start)),
+                    ("end", Double(t.end)),
+                    ("offset", Double(t.offset)),
+                    ("modeValue", Uint(mode)),
+                ])));
+            }
         }
-        placed.push((s.id, s.kind, Placed { shape, path: Some(path), colour: Some(colour), colour_end: Some(colour_end) }));
+        placed.push((s.id, s.kind, Placed { shape, path: Some(path), colour: Some(colour), colour_end: Some(colour_end), trim }));
     }
 
     // Events are artboard components the app can listen for.
@@ -1050,6 +1128,14 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                     (Some((v, true)), Prop::OutAngle) => vec![(v, "CubicDetachedVertex", "outRotation")],
                     (Some((v, true)), Prop::OutLength) => vec![(v, "CubicDetachedVertex", "outDistance")],
                     _ => vec![],
+                },
+                Prop::TrimStart | Prop::TrimEnd | Prop::TrimOffset => match p.trim {
+                    Some(trim) => vec![(trim, "TrimPath", match t.prop {
+                        Prop::TrimStart => "start",
+                        Prop::TrimEnd => "end",
+                        _ => "offset",
+                    })],
+                    None => vec![],
                 },
                 Prop::Width | Prop::Height | Prop::CornerRadius | Prop::Fill | Prop::FillEnd if *kind == ShapeKind::Group => vec![],
                 Prop::X | Prop::Y | Prop::Rotation | Prop::ScaleX | Prop::ScaleY | Prop::Opacity if *kind == ShapeKind::Group => {
@@ -1401,6 +1487,46 @@ mod tests {
         let keyed = file.objects.iter().find(|o| o.type_name.as_deref() == Some("KeyedProperty")).unwrap();
         assert_eq!(keyed.properties[0].value, Value::Uint(38), "GradientStop.colorValue, not SolidColor's 37");
         assert_eq!(d.evaluate(Some(0), 0.0)[0].gradient.as_ref().unwrap().stops[1].color, 0xffffc837);
+    }
+
+    #[test]
+    fn trim_exports_under_the_stroke_and_keys_its_end() {
+        let mut d = Document::new();
+        let id = 1;
+        let mut line = Shape::new(id, "line", ShapeKind::Path, 50.0, 50.0, 0.0, 0.0, 0).stroke(0xffffffff, 6.0).trim(0.0, 1.0);
+        line.paths = vec![SubPath { closed: false, points: vec![
+            Vertex { x: -40.0, y: 0.0, in_x: -40.0, in_y: 0.0, out_x: -20.0, out_y: -40.0 },
+            Vertex { x: 40.0, y: 0.0, in_x: 20.0, in_y: 40.0, out_x: 40.0, out_y: 0.0 }] }];
+        d.shapes.push(line);
+        d.animations[0].tracks.push(Track { shape_id: id, prop: Prop::TrimEnd, point: None, keys: vec![
+            Key { frame: 0, value: 0.0, ease: Ease::Linear }, Key { frame: 60, value: 1.0, ease: Ease::Linear }] });
+        // Playback moves the trim; the shape's stroke keeps its own colour and width.
+        let mid = d.evaluate(Some(0), 30.0);
+        assert!((mid[0].stroke.unwrap().trim.unwrap().end - 0.5).abs() < 1e-6);
+        assert_eq!(mid[0].stroke.unwrap().thickness, 6.0);
+
+        let bytes = d.export_riv();
+        let schema = Schema::bundled();
+        let file = vectro_riv::read(&bytes, &schema).expect("valid .riv");
+        let objs = &file.objects;
+        let stroke = objs.iter().position(|o| o.type_name.as_deref() == Some("Stroke")).expect("a Stroke");
+        let trim = objs.iter().position(|o| o.type_name.as_deref() == Some("TrimPath")).expect("a TrimPath");
+        let prop = |i: usize, n: &str| objs[i].properties.iter().find(|p| p.name.as_deref() == Some(n)).map(|p| p.value.clone());
+        // Component index = file position - 1 (the backboard comes first).
+        assert_eq!(prop(trim, "parentId"), Some(Value::Uint(stroke as u64 - 1)), "the TrimPath sits under the Stroke");
+        assert_eq!(prop(trim, "start"), Some(Value::Double(0.0)));
+        assert_eq!(prop(trim, "end"), Some(Value::Double(1.0)));
+        assert_eq!(prop(trim, "modeValue"), Some(Value::Uint(1)), "sequential");
+        let keyed = objs.iter().find(|o| o.type_name.as_deref() == Some("KeyedObject")).unwrap();
+        assert_eq!(keyed.properties[0].value, Value::Uint(trim as u64 - 1), "the keyed object is the TrimPath");
+        let key = objs.iter().find(|o| o.type_name.as_deref() == Some("KeyedProperty")).unwrap();
+        assert_eq!(key.properties[0].value, Value::Uint(115), "TrimPath.end");
+        assert_eq!(vectro_riv::write(&file), bytes, "round-trips through vectro-riv");
+        // Old JSON without a trim still loads, and a trimmed stroke survives the JSON trip.
+        let json = serde_json::to_string(&d).unwrap();
+        assert_eq!(serde_json::from_str::<Document>(&json).unwrap(), d);
+        let plain: Stroke = serde_json::from_str(r#"{"color":4294967295,"thickness":2}"#).unwrap();
+        assert_eq!(plain.trim, None);
     }
 
     #[test]
