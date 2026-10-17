@@ -18,7 +18,9 @@ along it) and key how far along it is. Rive's own web runtime plays the export t
 shows it (checked frame by frame). State machines work in the core (`vectro-doc`): inputs, layers, states, number-driven blends,
 transitions with exit times and random choice, pointer listeners and events. Two files prove it in
 Rive's runtime: a loading bar and a tiny whack-a-mole game, drawn with gradients, strokes and
-Rive's feather (soft shadows and glows). The editor has a **State machines** tab: inputs, layers,
+Rive's feather (soft shadows and glows). Strokes can draw on: a trim path with keyable start, end
+and offset (`examples/draw_on.rs`), shown on the canvas as a dash and trimmed exactly by the
+runtime. The editor has a **State machines** tab: inputs, layers,
 a node graph (drag a state's port onto another state to add a transition), conditions, exit times,
 blends, random weights, and pointer listeners on shapes. **Preview** plays a machine with Rive's own
 runtime and gives every input a control.
@@ -44,6 +46,11 @@ drag a box to select several; ⌘G group, ⇧⌘G ungroup, ⌘D duplicate, arrow
 double-click to finish. Points: drag points and handles, Alt-drag a point to pull handles out, Alt on a
 handle breaks the pair, double-click the outline to add a point, ⌫ removes one. View: ⌘-wheel or
 pinch zooms, wheel pans, space-drag pans, ⌘0 fits. Space plays, ⌘Z / ⇧⌘Z undo / redo.
+Animate: the timeline is a dope sheet grouped by shape (fold a shape, drag its summary diamond to
+move every key at that frame). Click a key, shift-click or shift-drag a box for several, drag to move
+them, ⌘C / ⌘V copies keys to the playhead, ⌫ deletes, the ease buttons apply to the selection.
+Onion shows ghosts of nearby frames on the canvas. O is the pivot tool: drag a shape's origin without
+moving the shape, so it rotates and scales around a joint.
 
 ## Tools
 

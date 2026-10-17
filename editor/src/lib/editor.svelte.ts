@@ -1,8 +1,11 @@
 import * as core from "../wasm/vectro_wasm.js";
 import {
-  EASES, ancestors, keyValue, localBounds, worldMatrix,
-  type Doc, type Ease, type Prop as AnyProp, type KeyProp as Prop, type Shape, type ShapeKind, type Track, type Vertex,
+  EASES, ancestors, localBounds, readProp, worldMatrix, writeProp,
+  type Doc, type Ease, type KeyProp, type Prop as AnyProp, type Shape, type ShapeKind, type Track, type Vertex,
 } from "./types";
+
+/** What the properties panel can key: the shape's own fields and the keyable paint fields. */
+type Prop = KeyProp;
 
 const STORAGE = "vectro.document";
 export type Tool = "select" | "rectangle" | "ellipse" | "pen" | "node" | "pivot";
@@ -418,6 +421,19 @@ class Editor {
     else delete s.stroke;
   }
 
+  /** Draw-on: trim the stroke to a run of its outline (needs a stroke; adds one if missing). */
+  setTrim(id: number, on: boolean) {
+    const s = this.shape(id);
+    if (!s) return;
+    this.checkpoint();
+    if (!on) {
+      if (s.stroke) delete s.stroke.trim;
+      return;
+    }
+    s.stroke ??= { color: 0xffffffff, thickness: 2, cap: 1, join: 1 };
+    s.stroke.trim = { start: 0, end: 1, offset: 0, mode: "sequential" };
+  }
+
   setFeather(id: number, on: boolean) {
     const s = this.shape(id);
     if (!s) return;
@@ -445,10 +461,7 @@ class Editor {
     if (checkpoint) this.checkpoint();
     if (this.mode === "design" || !this.animation) {
       const s = this.shape(shapeId);
-      if (!s) return;
-      if (prop === "followDistance") {
-        if (s.follow) s.follow.distance = value;
-      } else s[prop] = value;
+      if (s) writeProp(s, prop, value);
       return;
     }
     const frame = Math.round(this.frame);
@@ -476,7 +489,7 @@ class Editor {
       this.selectedKey = null;
     } else {
       const shown = this.shown.find((s) => s.id === shapeId);
-      if (shown) this.setProp(shapeId, prop, keyValue(shown, prop));
+      if (shown) this.setProp(shapeId, prop, readProp(shown, prop));
     }
   }
 
