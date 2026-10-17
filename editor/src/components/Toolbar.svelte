@@ -1,5 +1,6 @@
 <script lang="ts">
   import { editor, type Align, type Tool } from "../lib/editor.svelte";
+  import { isDesktop, openTextFile, saveFile, RIV_FILES, SVG_FILES, VECTRO_FILES, type FileFilter } from "../lib/desktop";
   import type { Doc } from "../lib/types";
 
   let { onPreview }: { onPreview: () => void } = $props();
@@ -33,38 +34,67 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  /** A native save dialog in the desktop app, a download in the browser. */
+  async function save(data: string | Uint8Array, name: string, type: string, filter: FileFilter) {
+    if (!isDesktop()) return download(data as BlobPart, name, type);
+    try {
+      await saveFile(name, filter, data);
+    } catch (e) {
+      editor.error = `Could not save ${name}: ${e}`;
+    }
+  }
+
+  /** A native open dialog in the desktop app, the hidden file input in the browser. */
+  async function pick(input: HTMLInputElement, filter: FileFilter, load: (name: string, text: string) => void) {
+    if (!isDesktop()) return input.click();
+    try {
+      const file = await openTextFile(filter);
+      if (file) load(file.name, file.text);
+    } catch (e) {
+      editor.error = `Could not open the file: ${e}`;
+    }
+  }
+
   const slug = () => editor.doc.artboard.name.trim().replace(/\s+/g, "-").toLowerCase() || "vectro";
 
   function exportRiv() {
     try {
-      download(editor.exportRiv() as BlobPart, `${slug()}.riv`, "application/octet-stream");
+      save(editor.exportRiv(), `${slug()}.riv`, "application/octet-stream", RIV_FILES);
     } catch (e) {
       editor.error = String(e);
+    }
+  }
+
+  function loadDoc(name: string, text: string) {
+    try {
+      const doc = JSON.parse(text) as Doc;
+      if (!doc.artboard || !Array.isArray(doc.shapes) || !Array.isArray(doc.animations)) throw new Error("not a Vectro project");
+      editor.open(doc);
+    } catch (err) {
+      editor.error = `Could not open ${name}: ${err}`;
     }
   }
 
   async function openFile(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    try {
-      const doc = JSON.parse(await file.text()) as Doc;
-      if (!doc.artboard || !Array.isArray(doc.shapes) || !Array.isArray(doc.animations)) throw new Error("not a Vectro project");
-      editor.open(doc);
-    } catch (err) {
-      editor.error = `Could not open ${file.name}: ${err}`;
-    }
+    loadDoc(file.name, await file.text());
     fileInput.value = "";
+  }
+
+  function loadSvg(name: string, text: string) {
+    try {
+      const n = editor.importSvg(text);
+      if (!n) editor.error = `${name} had no filled shapes to import`;
+    } catch (err) {
+      editor.error = `Could not import ${name}: ${err}`;
+    }
   }
 
   async function importSvg(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    try {
-      const n = editor.importSvg(await file.text());
-      if (!n) editor.error = `${file.name} had no filled shapes to import`;
-    } catch (err) {
-      editor.error = `Could not import ${file.name}: ${err}`;
-    }
+    loadSvg(file.name, await file.text());
     svgInput.value = "";
   }
 </script>
@@ -99,9 +129,9 @@
     <button class="error" onclick={() => (editor.error = null)} title="Dismiss">{editor.error}</button>
   {/if}
   <div class="group">
-    <button onclick={() => svgInput.click()} title="Add the shapes from an SVG file">Import SVG</button>
-    <button onclick={() => fileInput.click()}>Open</button>
-    <button onclick={() => download(JSON.stringify(editor.doc, null, 1), `${slug()}.vectro.json`, "application/json")}>Save</button>
+    <button onclick={() => pick(svgInput, SVG_FILES, loadSvg)} title="Add the shapes from an SVG file">Import SVG</button>
+    <button onclick={() => pick(fileInput, VECTRO_FILES, loadDoc)}>Open</button>
+    <button onclick={() => save(JSON.stringify(editor.doc, null, 1), `${slug()}.vectro.json`, "application/json", VECTRO_FILES)}>Save</button>
     <button onclick={onPreview}>Preview</button>
     <button class="active" onclick={exportRiv}>Export .riv</button>
   </div>
