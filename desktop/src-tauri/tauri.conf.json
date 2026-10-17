@@ -1,0 +1,66 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Vectro",
+  "version": "0.1.0",
+  "identifier": "app.openvectro.vectro",
+  "build": {
+    "frontendDist": "../../editor/dist",
+    "devUrl": "http://127.0.0.1:5180",
+    "beforeDevCommand": "npm --prefix ../editor run dev -- --port 5180 --strictPort",
+    "beforeBuildCommand": "npm --prefix ../editor run wasm && npm --prefix ../editor run build"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Vectro",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 960,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": true,
+    "publisher": "Vectro",
+    "copyright": "MIT licence",
+    "category": "GraphicsAndDesign",
+    "shortDescription": "Interactive vector animation",
+    "longDescription": "Free, open-source interactive vector animation: layers, vectors, timelines and state machines. Exports .riv files that play on the existing free runtimes.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    },
+    "linux": {
+      "deb": { "depends": [] }
+    },
+    "windows": {
+      "nsis": { "installMode": "currentUser" }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU5ODVEMzQ0RTA0NEVFRDkKUldUWjdrVGdSTk9GV2Q2b2UxQkZhRjVRcFh2QlJyblp4TDYxVjN5MVRKRXQ4MkFYMjRiLzRGQ3cK",
+      "endpoints": [
+        "https://github.com/openvectro/vectro/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

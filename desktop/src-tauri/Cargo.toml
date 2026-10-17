@@ -1,0 +1,27 @@
+[package]
+name = "vectro-desktop"
+version = "0.1.0"
+description = "Vectro: free, open-source interactive vector animation that exports .riv"
+license = "MIT"
+repository = "https://github.com/openvectro/vectro"
+edition = "2021"
+rust-version = "1.80"
+
+# Standalone on purpose, not a member of the root workspace: `cargo test` at the root must stay
+# a core-only build (Tauri needs webkit2gtk on Linux and a long compile everywhere). This crate
+# keeps its own Cargo.lock and target directory.
+[workspace]
+
+[lib]
+name = "vectro_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde_json = "1"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-updater = "2"
