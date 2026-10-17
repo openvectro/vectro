@@ -43,6 +43,11 @@ drag a box to select several; ⌘G group, ⇧⌘G ungroup, ⌘D duplicate, arrow
 double-click to finish. Points: drag points and handles, Alt-drag a point to pull handles out, Alt on a
 handle breaks the pair, double-click the outline to add a point, ⌫ removes one. View: ⌘-wheel or
 pinch zooms, wheel pans, space-drag pans, ⌘0 fits. Space plays, ⌘Z / ⇧⌘Z undo / redo.
+Animate: the timeline is a dope sheet grouped by shape (fold a shape, drag its summary diamond to
+move every key at that frame). Click a key, shift-click or shift-drag a box for several, drag to move
+them, ⌘C / ⌘V copies keys to the playhead, ⌫ deletes, the ease buttons apply to the selection.
+Onion shows ghosts of nearby frames on the canvas. O is the pivot tool: drag a shape's origin without
+moving the shape, so it rotates and scales around a joint.
 
 ## Tools
 
