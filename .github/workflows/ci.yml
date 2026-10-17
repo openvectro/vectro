@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Rust tests, wasm and editor build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust stable with the wasm target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Test the workspace
+        run: cargo test --workspace
+
+      - name: Install wasm-pack
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: editor/package-lock.json
+
+      - name: Build the wasm
+        working-directory: editor
+        run: npm run wasm
+
+      - name: Install editor dependencies
+        working-directory: editor
+        run: npm ci
+
+      - name: Type-check the editor
+        working-directory: editor
+        run: npm run check
+
+      - name: Build the editor
+        working-directory: editor
+        run: npm run build
