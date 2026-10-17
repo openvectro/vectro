@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "artboard": {
+    "name": "Motion path",
+    "width": 300.0,
+    "height": 200.0,
+    "background": 4280295456
+  },
+  "shapes": [
+    {
+      "id": 1,
+      "name": "track",
+      "kind": "path",
+      "x": 150.0,
+      "y": 100.0,
+      "width": 0.0,
+      "height": 0.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 0,
+      "paths": [
+        {
+          "closed": false,
+          "points": [
+            {
+              "x": -110.0,
+              "y": 60.0,
+              "inX": -110.0,
+              "inY": 60.0,
+              "outX": -60.0,
+              "outY": 60.0
+            },
+            {
+              "x": 0.0,
+              "y": 0.0,
+              "inX": -50.0,
+              "inY": 0.0,
+              "outX": 50.0,
+              "outY": 0.0
+            },
+            {
+              "x": 110.0,
+              "y": -60.0,
+              "inX": 60.0,
+              "inY": -60.0,
+              "outX": 110.0,
+              "outY": -60.0
+            }
+          ]
+        }
+      ],
+      "fillRule": "nonZero",
+      "originX": 0.5,
+      "originY": 0.5,
+      "stroke": {
+        "color": 4285295732,
+        "thickness": 2.0,
+        "cap": 1,
+        "join": 1
+      }
+    },
+    {
+      "id": 2,
+      "name": "dot",
+      "kind": "ellipse",
+      "x": 0.0,
+      "y": 0.0,
+      "width": 20.0,
+      "height": 20.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "opacity": 1.0,
+      "cornerRadius": 0.0,
+      "fill": 4294916912,
+      "fillRule": "nonZero",
+      "originX": 0.5,
+      "originY": 0.5,
+      "follow": {
+        "path": 1,
+        "distance": 0.0,
+        "orient": true,
+        "offset": false
+      }
+    }
+  ],
+  "animations": [
+    {
+      "name": "Follow",
+      "fps": 60,
+      "duration": 120,
+      "loop": "oneShot",
+      "tracks": [
+        {
+          "shapeId": 2,
+          "prop": "followDistance",
+          "keys": [
+            {
+              "frame": 0,
+              "value": 0.0,
+              "ease": {
+                "type": "linear"
+              }
+            },
+            {
+              "frame": 120,
+              "value": 1.0,
+              "ease": {
+                "type": "hold"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

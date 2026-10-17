@@ -11,7 +11,11 @@ export type PointProp = "pointX" | "pointY" | "inAngle" | "inLength" | "outAngle
 export type PaintProp = "fillEnd" | "trimStart" | "trimEnd" | "trimOffset";
 export type TrimMode = "sequential" | "synchronized";
 export interface Trim { start: number; end: number; offset: number; mode: TrimMode }
-export type Prop = ShapeProp | PointProp | PaintProp;
+/** How far along its motion path a following shape sits, 0..1 (`Shape.follow.distance`). */
+export type FollowProp = "followDistance";
+/** What the Properties panel can key: a shape's own values, its paints, and its motion path distance. */
+export type KeyProp = ShapeProp | PaintProp | FollowProp;
+export type Prop = ShapeProp | PointProp | PaintProp | FollowProp;
 export type Ease =
   | { type: "hold" }
   | { type: "linear" }
@@ -41,7 +45,13 @@ export interface Shape {
   gradient?: { kind: "linear" | "radial"; start: [number, number]; end: [number, number]; stops: { position: number; color: number }[] };
   stroke?: { color: number; thickness: number; cap?: number; join?: number; trim?: Trim };
   feather?: { strength: number; offset?: [number, number]; inner?: boolean };
+  /** A motion path: the shape sits `distance` (0..1) along path shape `path`; its own x/y count only when `offset` is on. */
+  follow?: { path: number; distance: number; orient?: boolean; offset?: boolean };
 }
+
+/** The value of a keyable property as a shape shows it. */
+
+/** The label a property gets on the timeline and in the panel. */
 
 /** SVG paint for a shape: a gradient reference or the flat colour. */
 export const paintOf = (s: Shape) => (s.gradient ? `url(#grad-${s.id})` : argbToCss(s.fill));
@@ -209,11 +219,12 @@ export const PAINT_PROPS: { prop: PaintProp; label: string; step: number; min?: 
 ];
 
 /** The label a track shows on the timeline. */
-export const propLabel = (prop: string) => PROPS.find((p) => p.prop === prop)?.label ?? PAINT_PROPS.find((p) => p.prop === prop)?.label ?? prop;
+export const propLabel = (prop: string) => prop === "followDistance" ? "Path distance" : PROPS.find((p) => p.prop === prop)?.label ?? PAINT_PROPS.find((p) => p.prop === prop)?.label ?? prop;
 
 /** Read a keyable property off a shape (design or evaluated values). */
-export function readProp(s: Shape, prop: ShapeProp | PaintProp): number {
+export function readProp(s: Shape, prop: KeyProp): number {
   switch (prop) {
+    case "followDistance": return s.follow?.distance ?? 0;
     case "fillEnd": return s.gradient?.stops[s.gradient.stops.length - 1]?.color ?? s.fill;
     case "trimStart": return s.stroke?.trim?.start ?? 0;
     case "trimEnd": return s.stroke?.trim?.end ?? 1;
@@ -223,8 +234,9 @@ export function readProp(s: Shape, prop: ShapeProp | PaintProp): number {
 }
 
 /** Write a keyable property to a shape's design values. A trim key needs "draw on" to be on. */
-export function writeProp(s: Shape, prop: ShapeProp | PaintProp, value: number) {
+export function writeProp(s: Shape, prop: KeyProp, value: number) {
   switch (prop) {
+    case "followDistance": if (s.follow) s.follow.distance = value; return;
     case "fillEnd": {
       const last = s.gradient?.stops[s.gradient.stops.length - 1];
       if (last) last.color = value; else s.fill = value;

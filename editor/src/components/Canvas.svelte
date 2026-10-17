@@ -447,6 +447,14 @@
       {/each}
     {/if}
 
+    <!-- The motion path a selected shape follows, as a dashed guide -->
+    {#each selectedShapes.filter((s) => s.follow) as s (s.id)}
+      {@const target = editor.shown.find((x) => x.id === s.follow!.path && x.kind === "path")}
+      {#if target}
+        <g transform={chain(target)} class="guide"><path d={pathData(target)} vector-effect="non-scaling-stroke" /></g>
+      {/if}
+    {/each}
+
     <!-- The pivot, while the pivot tool is on -->
     {#if editor.tool === "pivot" && editor.selectedShape}
       {@const s = editor.shown.find((x) => x.id === editor.selected)}
@@ -517,6 +525,7 @@
   .nodes .vertex.first { stroke: var(--key); }
   .box { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; pointer-events: none; }
   .ghost * { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-dasharray: 4 3; pointer-events: none; }
+  .guide path { fill: none; stroke: var(--key); stroke-width: 1.5; stroke-dasharray: 6 4; pointer-events: none; }
   .pivot circle { fill: var(--key); stroke: #000; stroke-width: 1; pointer-events: none; }
   .pivot path { stroke: var(--key); stroke-width: 1.5; pointer-events: none; }
   .stage.pivoting svg { cursor: crosshair; }

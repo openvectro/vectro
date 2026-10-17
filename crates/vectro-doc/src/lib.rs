@@ -322,6 +322,27 @@ pub struct Shape {
     /// Rive's feather: softens the fill into a glow or shadow.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub feather: Option<Feather>,
+    /// A motion path: the shape's position is driven by a path shape in the document.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub follow: Option<FollowPath>,
+}
+
+/// Follows a path shape (Rive's FollowPathConstraint). `distance` is 0..1 along the whole
+/// path by arc length; whole numbers past 0 land on the end, anything else wraps. The shape's
+/// own x/y are ignored unless `offset` is on, when they are added to the point on the path.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct FollowPath {
+    /// Id of the path shape to follow.
+    pub path: u32,
+    #[serde(default)]
+    pub distance: f32,
+    /// Turn the shape to face along the path.
+    #[serde(default)]
+    pub orient: bool,
+    /// Keep the shape's own x/y as an offset from the point on the path.
+    #[serde(default)]
+    pub offset: bool,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -440,7 +461,14 @@ impl Shape {
             gradient: None,
             stroke: None,
             feather: None,
+            follow: None,
         }
+    }
+
+    /// Put the shape on a motion path: `path` is the id of a path shape in the document.
+    pub fn follow(mut self, path: u32, orient: bool) -> Self {
+        self.follow = Some(FollowPath { path, distance: 0.0, orient, offset: false });
+        self
     }
 
     pub fn gradient(mut self, g: Gradient) -> Self {
@@ -537,6 +565,8 @@ pub enum Prop {
     InLength,
     OutAngle,
     OutLength,
+    /// How far along its motion path a following shape sits, 0..1 (`Shape::follow`).
+    FollowDistance,
 }
 
 impl Prop {
@@ -574,6 +604,7 @@ impl Prop {
             Prop::CornerRadius => s.corner_radius as f64,
             Prop::Fill => s.gradient.as_ref().and_then(|g| g.stops.first()).map_or(s.fill, |st| st.color) as f64,
             Prop::FillEnd => s.gradient.as_ref().and_then(|g| g.stops.last()).map_or(s.fill, |st| st.color) as f64,
+            Prop::FollowDistance => s.follow.map_or(0.0, |f| f.distance as f64),
             Prop::TrimStart => s.stroke.and_then(|st| st.trim).map_or(0.0, |t| t.start) as f64,
             Prop::TrimEnd => s.stroke.and_then(|st| st.trim).map_or(1.0, |t| t.end) as f64,
             Prop::TrimOffset => s.stroke.and_then(|st| st.trim).map_or(0.0, |t| t.offset) as f64,
@@ -600,6 +631,11 @@ impl Prop {
                 Some(st) => st.color = v as u32,
                 None => s.fill = v as u32,
             },
+            Prop::FollowDistance => {
+                if let Some(f) = s.follow.as_mut() {
+                    f.distance = v as f32;
+                }
+            }
             // A trim key only moves an existing trim; without "draw on" the stroke stays whole.
             Prop::TrimStart | Prop::TrimEnd | Prop::TrimOffset => {
                 if let Some(t) = s.stroke.as_mut().and_then(|st| st.trim.as_mut()) {
@@ -859,6 +895,21 @@ impl Document {
                 p.out_y = p.y + ol * oa.sin();
             }
         }
+        // Motion paths: a following shape takes its place on the path, the way Rive's
+        // FollowPathConstraint puts it there (world position, tangent when oriented).
+        for i in 0..shapes.len() {
+            let Some(f) = shapes[i].follow else { continue };
+            let Some(target) = shapes.iter().find(|s| s.id == f.path && s.kind == ShapeKind::Path) else { continue };
+            let Some((px, py, angle)) = sample_path(&shapes, target, f.distance) else { continue };
+            let (wx, wy) = if f.offset { (px + shapes[i].x, py + shapes[i].y) } else { (px, py) };
+            let parent = world_transform(&shapes, &shapes[i], false);
+            let (lx, ly) = parent.invert_point(wx, wy);
+            shapes[i].x = lx;
+            shapes[i].y = ly;
+            if f.orient {
+                shapes[i].rotation = (angle - parent.rotation()).to_degrees();
+            }
+        }
         shapes
     }
 
@@ -873,6 +924,118 @@ impl Default for Document {
     }
 }
 
+/// A 2D affine matrix in the usual (a, b, c, d, tx, ty) layout: x' = a x + c y + tx, y' = b x + d y + ty.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Mat([f32; 6]);
+
+impl Mat {
+    pub const IDENTITY: Mat = Mat([1.0, 0.0, 0.0, 1.0, 0.0, 0.0]);
+
+    /// translate(x, y) · rotate(degrees) · scale(sx, sy), the transform of one shape.
+    pub fn trs(x: f32, y: f32, rotation: f32, sx: f32, sy: f32) -> Mat {
+        let (sin, cos) = rotation.to_radians().sin_cos();
+        Mat([cos * sx, sin * sx, -sin * sy, cos * sy, x, y])
+    }
+
+    pub fn mul(self, o: Mat) -> Mat {
+        let (a, b, c, d, tx, ty) = (self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5]);
+        let (oa, ob, oc, od, ox, oy) = (o.0[0], o.0[1], o.0[2], o.0[3], o.0[4], o.0[5]);
+        Mat([a * oa + c * ob, b * oa + d * ob, a * oc + c * od, b * oc + d * od, a * ox + c * oy + tx, b * ox + d * oy + ty])
+    }
+
+    pub fn apply(self, x: f32, y: f32) -> (f32, f32) {
+        (self.0[0] * x + self.0[2] * y + self.0[4], self.0[1] * x + self.0[3] * y + self.0[5])
+    }
+
+    /// The point in this matrix's own space that maps to (x, y); the identity when singular.
+    pub fn invert_point(self, x: f32, y: f32) -> (f32, f32) {
+        let (a, b, c, d, tx, ty) = (self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5]);
+        let det = a * d - b * c;
+        if det.abs() < 1e-12 {
+            return (x - tx, y - ty);
+        }
+        let (dx, dy) = (x - tx, y - ty);
+        ((d * dx - c * dy) / det, (a * dy - b * dx) / det)
+    }
+
+    /// The rotation this matrix applies, in radians.
+    pub fn rotation(self) -> f32 {
+        self.0[1].atan2(self.0[0])
+    }
+}
+
+/// A shape's matrix into artboard space (its groups', and its own unless `include_self` is false).
+pub fn world_transform(shapes: &[Shape], s: &Shape, include_self: bool) -> Mat {
+    let mut chain = Vec::new();
+    let mut p = s.parent.and_then(|id| shapes.iter().find(|x| x.id == id && x.kind == ShapeKind::Group));
+    while let Some(g) = p {
+        if chain.len() > 64 {
+            break;
+        }
+        chain.push(g);
+        p = g.parent.and_then(|id| shapes.iter().find(|x| x.id == id && x.kind == ShapeKind::Group));
+    }
+    let mut m = Mat::IDENTITY;
+    for g in chain.iter().rev() {
+        m = m.mul(Mat::trs(g.x, g.y, g.rotation, g.scale_x, g.scale_y));
+    }
+    if include_self {
+        m = m.mul(Mat::trs(s.x, s.y, s.rotation, s.scale_x, s.scale_y));
+    }
+    m
+}
+
+/// The point `distance` (0..1 by arc length) along a path shape, in artboard space, with the
+/// tangent angle in radians. Each curve is flattened into 32 straight pieces. Follows Rive's
+/// rule for the fraction: it wraps, except that a whole number past 0 lands on the end.
+pub fn sample_path(shapes: &[Shape], path: &Shape, distance: f32) -> Option<(f32, f32, f32)> {
+    let m = world_transform(shapes, path, true);
+    let mut segs: Vec<((f32, f32), (f32, f32), f32)> = Vec::new();
+    for sub in &path.paths {
+        let pts = &sub.points;
+        let n = if sub.closed { pts.len() } else { pts.len().saturating_sub(1) };
+        for i in 0..n {
+            let (a, b) = (pts[i], pts[(i + 1) % pts.len()]);
+            let at = |t: f32| {
+                let u = 1.0 - t;
+                let x = u * u * u * a.x + 3.0 * u * u * t * a.out_x + 3.0 * u * t * t * b.in_x + t * t * t * b.x;
+                let y = u * u * u * a.y + 3.0 * u * u * t * a.out_y + 3.0 * u * t * t * b.in_y + t * t * t * b.y;
+                m.apply(x, y)
+            };
+            let mut prev = at(0.0);
+            for k in 1..=32 {
+                let next = at(k as f32 / 32.0);
+                segs.push((prev, next, (next.0 - prev.0).hypot(next.1 - prev.1)));
+                prev = next;
+            }
+        }
+    }
+    let first = path.paths.iter().flat_map(|p| p.points.first()).next()?;
+    let total: f32 = segs.iter().map(|s| s.2).sum();
+    if segs.is_empty() || total <= 0.0 {
+        let (x, y) = m.apply(first.x, first.y);
+        return Some((x, y, 0.0));
+    }
+    let mut p = distance % 1.0;
+    if p < 0.0 {
+        p += 1.0;
+    }
+    if distance != 0.0 && p == 0.0 {
+        p = 1.0;
+    }
+    let want = total * p;
+    let mut walked = 0.0;
+    for (i, &(a, b, len)) in segs.iter().enumerate() {
+        if walked + len >= want || i == segs.len() - 1 {
+            let t = if len > 0.0 { ((want - walked) / len).clamp(0.0, 1.0) } else { 0.0 };
+            let angle = (b.1 - a.1).atan2(b.0 - a.0);
+            return Some((a.0 + (b.0 - a.0) * t, a.1 + (b.1 - a.1) * t, angle));
+        }
+        walked += len;
+    }
+    None
+}
+
 /// Artboard component indices for one shape.
 struct Placed {
     shape: u64,
@@ -880,6 +1043,8 @@ struct Placed {
     /// The component holding the fill colour, and its type (SolidColor or GradientStop).
     colour: Option<(u64, &'static str)>,
     colour_end: Option<(u64, &'static str)>,
+    /// The FollowPathConstraint component, when the shape is on a motion path.
+    follow: Option<u64>,
     /// The stroke's TrimPath, when the stroke draws on.
     trim: Option<u64>,
 }
@@ -916,6 +1081,21 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
         .collect();
     let mut vertices: std::collections::HashMap<(u32, u32, u32), (u64, bool)> = std::collections::HashMap::new();
     let mut stack: Vec<(u32, u64)> = Vec::new(); // (shape id, parent component), popped in order
+    // Motion paths point at a path shape that may be placed later, so the target is filled in after.
+    let mut constraints: Vec<(usize, u32)> = Vec::new(); // (object position, target shape id)
+    let mut follow_path = |b: &mut Builder, comp: &mut dyn FnMut(usize) -> u64, s: &Shape, node: u64| -> Option<u64> {
+        let f = s.follow?;
+        let at = b.add("FollowPathConstraint", &[
+            ("parentId", Uint(node)),
+            ("strength", Double(1.0)),
+            ("targetId", Uint(0)),
+            ("distance", Double(f.distance)),
+            ("orient", Value::Bool(f.orient)),
+            ("offset", Value::Bool(f.offset)),
+        ]);
+        constraints.push((at, f.path));
+        Some(comp(at))
+    };
     let roots = doc.shapes.iter().filter(|s| s.parent.map_or(true, |p| !doc.shapes.iter().any(|o| o.id == p && o.kind == ShapeKind::Group)));
     for s in roots.collect::<Vec<_>>() {
         stack.push((s.id, 0));
@@ -933,7 +1113,8 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ("scaleY", Double(s.scale_y)),
                 ("opacity", Double(s.opacity)),
             ]));
-            placed.push((s.id, s.kind, Placed { shape: node, path: None, colour: None, colour_end: None, trim: None }));
+            let follow = follow_path(&mut b, &mut comp, s, node);
+            placed.push((s.id, s.kind, Placed { shape: node, path: None, colour: None, colour_end: None, follow, trim: None }));
             for c in doc.shapes.iter().filter(|c| c.parent == Some(s.id)) {
                 stack.push((c.id, node));
             }
@@ -949,6 +1130,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
             ("scaleY", Double(s.scale_y)),
             ("opacity", Double(s.opacity)),
         ]));
+        let follow = follow_path(&mut b, &mut comp, s, shape);
         let path = match s.kind {
             ShapeKind::Rectangle => {
                 let r = s.corner_radius;
@@ -1061,7 +1243,12 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 ])));
             }
         }
-        placed.push((s.id, s.kind, Placed { shape, path: Some(path), colour: Some(colour), colour_end: Some(colour_end), trim }));
+        placed.push((s.id, s.kind, Placed { shape, path: Some(path), colour: Some(colour), colour_end: Some(colour_end), follow, trim }));
+    }
+    for (at, target) in constraints {
+        if let Some((_, _, p)) = placed.iter().find(|(id, _, _)| *id == target) {
+            b.set(at, "targetId", Uint(p.shape));
+        }
     }
 
     // Events are artboard components the app can listen for.
@@ -1165,6 +1352,7 @@ fn export(doc: &Document, schema: &Schema) -> vectro_riv::RivFile {
                 Prop::CornerRadius => vec![],
                 Prop::Fill => vec![(colour, colour_owner, "colorValue")],
                 Prop::FillEnd => vec![(colour_end, colour_end_owner, "colorValue")],
+                Prop::FollowDistance => p.follow.map_or(vec![], |c| vec![(c, "FollowPathConstraint", "distance")]),
                 _ => vec![],
             };
             for (object, owner, name) in entries {
@@ -1487,6 +1675,63 @@ mod tests {
         let keyed = file.objects.iter().find(|o| o.type_name.as_deref() == Some("KeyedProperty")).unwrap();
         assert_eq!(keyed.properties[0].value, Value::Uint(38), "GradientStop.colorValue, not SolidColor's 37");
         assert_eq!(d.evaluate(Some(0), 0.0)[0].gradient.as_ref().unwrap().stops[1].color, 0xffffc837);
+    }
+
+    fn line(id: u32, name: &str, x: f32, y: f32, pts: &[(f32, f32)]) -> Shape {
+        let mut s = Shape::new(id, name, ShapeKind::Path, x, y, 0.0, 0.0, 0x00000000).stroke(0xffffffff, 2.0);
+        s.paths = vec![SubPath { closed: false, points: pts.iter().map(|&(x, y)| Vertex { x, y, in_x: x, in_y: y, out_x: x, out_y: y }).collect() }];
+        s
+    }
+
+    #[test]
+    fn follow_path_moves_the_shape_along_the_path() {
+        let mut d = Document::new();
+        d.shapes.push(line(1, "track", 100.0, 100.0, &[(0.0, 0.0), (100.0, 0.0), (100.0, 100.0)]));
+        d.shapes.push(Shape::new(2, "dot", ShapeKind::Ellipse, 5.0, 5.0, 10.0, 10.0, 0xffff0000).follow(1, true));
+        d.animations[0].tracks.push(Track { shape_id: 2, prop: Prop::FollowDistance, point: None, keys: vec![
+            Key { frame: 0, value: 0.0, ease: Ease::Linear }, Key { frame: 60, value: 1.0, ease: Ease::Linear }] });
+        let at = |f| d.evaluate(Some(0), f).into_iter().find(|s| s.id == 2).unwrap();
+        let near = |a: f32, b: f32| (a - b).abs() < 1e-3;
+        let (s0, s1, s2) = (at(0.0), at(30.0), at(60.0));
+        assert!(near(s0.x, 100.0) && near(s0.y, 100.0) && near(s0.rotation, 0.0), "start: {s0:?}");
+        assert!(near(s1.x, 200.0) && near(s1.y, 100.0), "half way is the corner: {s1:?}");
+        assert!(near(s2.x, 200.0) && near(s2.y, 200.0) && near(s2.rotation, 90.0), "end, facing down: {s2:?}");
+        // Offset keeps the shape's own x/y as a shift from the path point; distance 1 reaches the end, 1.5 wraps.
+        d.shapes[1].follow = Some(FollowPath { path: 1, distance: 1.0, orient: false, offset: true });
+        let s = d.evaluate(None, 0.0).into_iter().find(|s| s.id == 2).unwrap();
+        assert!(near(s.x, 205.0) && near(s.y, 205.0) && near(s.rotation, 0.0), "{s:?}");
+        d.shapes[1].follow.as_mut().unwrap().distance = 1.5;
+        assert!(near(d.evaluate(None, 0.0)[1].x, 205.0) && near(d.evaluate(None, 0.0)[1].y, 105.0));
+    }
+
+    #[test]
+    fn follow_path_exports_a_constraint_pointing_at_the_path() {
+        let mut d = Document::new();
+        // The path comes first in the document, so it is placed after its follower: the target id
+        // is only known once every shape has an index.
+        d.shapes.push(line(1, "track", 100.0, 100.0, &[(0.0, 0.0), (100.0, 0.0)]));
+        d.shapes.push(Shape::new(2, "dot", ShapeKind::Ellipse, 0.0, 0.0, 10.0, 10.0, 0xffff0000).follow(1, true));
+        d.animations[0].tracks.push(Track { shape_id: 2, prop: Prop::FollowDistance, point: None, keys: vec![
+            Key { frame: 0, value: 0.0, ease: Ease::Linear }, Key { frame: 60, value: 1.0, ease: Ease::Linear }] });
+        let bytes = d.export_riv();
+        let file = vectro_riv::read(&bytes, &Schema::bundled()).expect("valid .riv");
+        assert_eq!(vectro_riv::write(&file), bytes, "round-trips through vectro-riv");
+        let objects = &file.objects;
+        let prop = |o: &vectro_riv::Object, n: &str| o.properties.iter().find(|p| p.name.as_deref() == Some(n)).map(|p| p.value.clone());
+        let name = |o: &vectro_riv::Object| matches!(prop(o, "name"), Some(Value::String(ref n)) if n == "track");
+        let track = objects.iter().position(|o| o.type_name.as_deref() == Some("Shape") && name(o)).expect("the path's Shape");
+        let dot = objects.iter().position(|o| o.type_name.as_deref() == Some("Shape") && !name(o)).expect("the follower's Shape");
+        let (at, c) = objects.iter().enumerate().find(|(_, o)| o.type_name.as_deref() == Some("FollowPathConstraint")).expect("a FollowPathConstraint");
+        assert!(at > dot && at < track, "the constraint sits under its shape, before the path it points at");
+        // Component index = file position - 1 (the backboard comes first).
+        assert_eq!(prop(c, "targetId"), Some(Value::Uint(track as u64 - 1)));
+        assert_eq!(prop(c, "parentId"), Some(Value::Uint(dot as u64 - 1)));
+        assert_eq!(prop(c, "orient"), Some(Value::Bool(true)));
+        assert_eq!(prop(c, "strength"), Some(Value::Double(1.0)));
+        let keyed = objects.iter().find(|o| o.type_name.as_deref() == Some("KeyedObject")).unwrap();
+        assert_eq!(prop(keyed, "objectId"), Some(Value::Uint(at as u64 - 1)), "the keys drive the constraint");
+        let key = objects.iter().find(|o| o.type_name.as_deref() == Some("KeyedProperty")).unwrap();
+        assert_eq!(key.properties[0].value, Value::Uint(363), "FollowPathConstraint.distance");
     }
 
     #[test]
