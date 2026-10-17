@@ -404,6 +404,24 @@ impl<'s> Builder<'s> {
         self.schema
     }
 
+    /// Change a property of an object already added (by the position `add` returned), for
+    /// references that are only known once later objects have been placed.
+    pub fn set(&mut self, at: usize, name: &str, value: Value) {
+        let o = &mut self.objects[at];
+        let type_name = o.type_name.clone().expect("objects added here carry their type name");
+        let key = self
+            .schema
+            .property_key(&type_name, name)
+            .unwrap_or_else(|| panic!("{type_name} has no property {name}"));
+        if !self.used.contains(&key) {
+            self.used.push(key);
+        }
+        match o.properties.iter_mut().find(|p| p.key == key) {
+            Some(p) => p.value = value,
+            None => o.properties.push(Property { key, name: Some(name.to_string()), value }),
+        }
+    }
+
     pub fn finish(self) -> RivFile {
         let toc = self.used.iter().map(|k| (*k, self.schema.property_type(*k).unwrap_or(FieldType::Uint))).collect();
         RivFile { major: SUPPORTED_MAJOR, minor: 0, file_id: 1, toc, objects: self.objects }

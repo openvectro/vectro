@@ -1,6 +1,8 @@
 <script lang="ts">
   import { editor } from "../lib/editor.svelte";
-  import { PROPS, argbToHex, hexToArgb, type ShapeProp as Prop } from "../lib/types";
+  import { PAINT_PROPS, PROPS, argbToHex, hexToArgb, readProp, type ShapeProp as Prop, type TrimMode } from "../lib/types";
+
+  const TRIM_PROPS = PAINT_PROPS.filter((p) => p.prop.startsWith("trim"));
 
   const shape = $derived(editor.shown.find((s) => s.id === editor.selected) ?? null);
   const real = $derived(editor.selectedShape);
@@ -126,8 +128,28 @@
           <select value={st.join ?? 0} onchange={(e) => edit(() => (st.join = Number(e.currentTarget.value)))}>
             <option value={0}>Sharp</option><option value={1}>Round</option><option value={2}>Bevel</option>
           </select><span></span>
+          <label for="p-trim">Draw on</label>
+          <input id="p-trim" type="checkbox" checked={!!st.trim} onchange={(e) => editor.setTrim(real.id, e.currentTarget.checked)} /><span></span>
+          {#if st.trim}
+            {#each TRIM_PROPS as p}
+              <label for="p-{p.prop}">{p.label.replace("Trim ", "").replace(/^./, (c) => c.toUpperCase())}</label>
+              <input id="p-{p.prop}" type="number" step={p.step} min={p.min} max={p.max} value={+readProp(shape, p.prop).toFixed(3)}
+                onchange={(e) => editor.setProp(shape.id, p.prop, Number(e.currentTarget.value))} />
+              {#if animating}
+                <button class="key" class:on={!!editor.keyAtPlayhead(shape.id, p.prop)} class:has={!!editor.track(shape.id, p.prop)}
+                  onclick={() => editor.toggleKey(shape.id, p.prop)} title="Key at playhead">◆</button>
+              {:else}<span></span>{/if}
+            {/each}
+            <label for="p-trim-mode">Mode</label>
+            <select id="p-trim-mode" value={st.trim.mode} onchange={(e) => edit(() => (st.trim!.mode = e.currentTarget.value as TrimMode))}>
+              <option value="sequential">Sequential</option><option value="synchronized">Synchronized</option>
+            </select><span></span>
+          {/if}
         {/if}
       </div>
+      {#if real.stroke?.trim}
+        <p class="hint">Start and end are fractions of the outline; key End from 0 to 1 to draw the line on. The canvas approximates it with a dash; the runtime trims exactly.</p>
+      {/if}
 
       <div class="panel-title">Shadow / glow</div>
       <div class="grid">
@@ -158,6 +180,32 @@
           </select><span></span>
         </div>
       {/if}
+    {/if}
+    {#if shape.kind !== "path"}
+      {@const paths = editor.doc.shapes.filter((x) => x.kind === "path" && x.id !== real.id)}
+      <div class="panel-title">Motion path</div>
+      <div class="grid">
+        <label for="p-follow">Path</label>
+        <select id="p-follow" value={real.follow?.path ?? ""}
+          onchange={(e) => editor.setFollow(real.id, e.currentTarget.value === "" ? null : Number(e.currentTarget.value))}>
+          <option value="">None</option>
+          {#each paths as p (p.id)}<option value={p.id}>{p.name}</option>{/each}
+        </select><span></span>
+        {#if real.follow}
+          <label for="p-fdist">Distance</label>
+          <input id="p-fdist" type="number" step="0.01" min="0" max="1" value={+(shape.follow?.distance ?? 0).toFixed(3)}
+            onchange={(e) => editor.setProp(shape.id, "followDistance", num(e))} />
+          {#if animating}
+            <button class="key" class:on={!!editor.keyAtPlayhead(shape.id, "followDistance")} class:has={!!editor.track(shape.id, "followDistance")}
+              onclick={() => editor.toggleKey(shape.id, "followDistance")} title="Key at playhead">◆</button>
+          {:else}<span></span>{/if}
+          <label for="p-orient">Orient</label>
+          <input id="p-orient" type="checkbox" checked={!!real.follow.orient} onchange={(e) => editor.setFollowFlag(real.id, "orient", e.currentTarget.checked)} /><span></span>
+          <label for="p-offset">Offset</label>
+          <input id="p-offset" type="checkbox" checked={!!real.follow.offset} onchange={(e) => editor.setFollowFlag(real.id, "offset", e.currentTarget.checked)} /><span></span>
+        {/if}
+      </div>
+      {#if real.follow}<p class="hint">The path sets the position{real.follow.offset ? "; X and Y shift it" : "; X and Y are ignored unless Offset is on"}. Orient turns the shape along the path.</p>{/if}
     {/if}
     <div class="panel-title">Pivot</div>
     <div class="grid">

@@ -1,8 +1,11 @@
 import * as core from "../wasm/vectro_wasm.js";
 import {
-  EASES, ancestors, localBounds, worldMatrix,
-  type Doc, type Ease, type Prop as AnyProp, type ShapeProp as Prop, type Shape, type ShapeKind, type Track, type Vertex,
+  EASES, ancestors, localBounds, readProp, worldMatrix, writeProp,
+  type Doc, type Ease, type KeyProp, type Prop as AnyProp, type Shape, type ShapeKind, type Track, type Vertex,
 } from "./types";
+
+/** What the properties panel can key: the shape's own fields and the keyable paint fields. */
+type Prop = KeyProp;
 
 const STORAGE = "vectro.document";
 export type Tool = "select" | "rectangle" | "ellipse" | "pen" | "node" | "pivot";
@@ -221,7 +224,9 @@ class Editor {
     this.checkpoint();
     const gone = new Set([id, ...this.descendants(id)]);
     this.doc.shapes = this.doc.shapes.filter((s) => !gone.has(s.id));
-    for (const a of this.doc.animations) a.tracks = a.tracks.filter((t) => !gone.has(t.shapeId));
+    // A shape following a deleted path comes off it, and its distance keys go with it.
+    const orphans = new Set(this.doc.shapes.filter((s) => s.follow && gone.has(s.follow.path)).map((s) => (delete s.follow, s.id)));
+    for (const a of this.doc.animations) a.tracks = a.tracks.filter((t) => !gone.has(t.shapeId) && !(orphans.has(t.shapeId) && t.prop === "followDistance"));
     this.selectedIds = this.selectedIds.filter((x) => !gone.has(x));
     this.selectedVertex = null;
     this.selectedKey = null;
@@ -416,6 +421,19 @@ class Editor {
     else delete s.stroke;
   }
 
+  /** Draw-on: trim the stroke to a run of its outline (needs a stroke; adds one if missing). */
+  setTrim(id: number, on: boolean) {
+    const s = this.shape(id);
+    if (!s) return;
+    this.checkpoint();
+    if (!on) {
+      if (s.stroke) delete s.stroke.trim;
+      return;
+    }
+    s.stroke ??= { color: 0xffffffff, thickness: 2, cap: 1, join: 1 };
+    s.stroke.trim = { start: 0, end: 1, offset: 0, mode: "sequential" };
+  }
+
   setFeather(id: number, on: boolean) {
     const s = this.shape(id);
     if (!s) return;
@@ -443,7 +461,7 @@ class Editor {
     if (checkpoint) this.checkpoint();
     if (this.mode === "design" || !this.animation) {
       const s = this.shape(shapeId);
-      if (s) s[prop] = value;
+      if (s) writeProp(s, prop, value);
       return;
     }
     const frame = Math.round(this.frame);
@@ -471,8 +489,31 @@ class Editor {
       this.selectedKey = null;
     } else {
       const shown = this.shown.find((s) => s.id === shapeId);
-      if (shown) this.setProp(shapeId, prop, shown[prop]);
+      if (shown) this.setProp(shapeId, prop, readProp(shown, prop));
     }
+  }
+
+  // Motion paths
+
+  /** Put a shape on a path shape (null takes it off, dropping its distance keys). */
+  setFollow(id: number, path: number | null) {
+    const s = this.shape(id);
+    if (!s || s.id === path) return;
+    this.checkpoint();
+    if (path === null) {
+      delete s.follow;
+      for (const a of this.doc.animations) a.tracks = a.tracks.filter((t) => !(t.shapeId === id && t.prop === "followDistance"));
+      this.selectedKeys = [];
+      return;
+    }
+    s.follow = { path, distance: s.follow?.distance ?? 0, orient: s.follow?.orient ?? false, offset: s.follow?.offset ?? false };
+  }
+
+  setFollowFlag(id: number, flag: "orient" | "offset", on: boolean) {
+    const s = this.shape(id);
+    if (!s?.follow) return;
+    this.checkpoint();
+    s.follow[flag] = on;
   }
 
   deleteSelectedKey() {

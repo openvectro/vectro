@@ -13,11 +13,14 @@ they publish.
 
 Early, but it works end to end. Draw rectangles and ellipses or import SVG paths, key position, size,
 rotation, scale, opacity, corner radius and colour on a timeline with easing, play it
-back, and export `.riv`. Rive's own web runtime plays the export the same way the editor
+back, and export `.riv`. Put a shape on a motion path (it follows a path shape, optionally turning
+along it) and key how far along it is. Rive's own web runtime plays the export the same way the editor
 shows it (checked frame by frame). State machines work in the core (`vectro-doc`): inputs, layers, states, number-driven blends,
 transitions with exit times and random choice, pointer listeners and events. Two files prove it in
 Rive's runtime: a loading bar and a tiny whack-a-mole game, drawn with gradients, strokes and
-Rive's feather (soft shadows and glows). The editor has a **State machines** tab: inputs, layers,
+Rive's feather (soft shadows and glows). Strokes can draw on: a trim path with keyable start, end
+and offset (`examples/draw_on.rs`), shown on the canvas as a dash and trimmed exactly by the
+runtime. The editor has a **State machines** tab: inputs, layers,
 a node graph (drag a state's port onto another state to add a transition), conditions, exit times,
 blends, random weights, and pointer listeners on shapes. **Preview** plays a machine with Rive's own
 runtime and gives every input a control.

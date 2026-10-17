@@ -1,10 +1,9 @@
 <script lang="ts">
   import { editor } from "../lib/editor.svelte";
-  import { EASES, PROPS, type Ease, type LoopMode } from "../lib/types";
+  import { EASES, propLabel as label, type Ease, type LoopMode } from "../lib/types";
   import * as core from "../wasm/vectro_wasm.js";
 
   const anim = $derived(editor.animation);
-  const label = (prop: string) => PROPS.find((p) => p.prop === prop)?.label ?? prop;
   const pct = (frame: number) => `${(frame / Math.max(1, anim.duration)) * 100}%`;
   const ticks = $derived(Array.from({ length: Math.floor(anim.duration / anim.fps) + 1 }, (_, i) => i));
 

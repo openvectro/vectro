@@ -142,3 +142,28 @@ either in `tests/web/interactive.html?file=<riv>&sm=<machine>` to drive the inpu
   a feathered copy behind a shape is a glow or drop shadow, `inner` gives an inset shadow.
   **Rendered by `@rive-app/canvas` 2.44 and the native runtimes; ignored by `@rive-app/webgl2`
   2.44** (the file loads, the shadows are simply absent). Vectro's editor shows it as a CSS blur.
+
+## Trim path (2026-10-17)
+
+A draw-on is a `TrimPath` (47) under the `Stroke`, after its colour: `start` (114), `end` (115)
+and `offset` (116) are fractions of the outline's length, `modeValue` (117) is 0 off,
+1 sequential (several outlines trimmed one after another along their summed length),
+2 synchronized (every outline trimmed by the same fractions). Keying `end` from 0 to 1 draws
+the line on; the keyed object is the `TrimPath` component itself. `examples/draw_on.rs` writes
+`tests/web/draw-on.riv`, checked in `@rive-app/canvas` 2.44.2 by reading the pixel at the
+curve's midpoint: background at 0 s, stroke colour at 1 s. The editor's canvas stands in with
+an SVG dash over the outline's length, which is exact for one outline and sequential for several.
+
+## Follow path (2026-10-17)
+
+A shape on a motion path carries a `FollowPathConstraint` (type 165) as a child of its `Shape` or
+`Node`: `targetId` (from `TargetedConstraint`) is the component index of the path's `Shape`,
+`strength` (from `Constraint`) 1, `distance` (key 363) 0..1 by arc length over all of the target's
+paths, `orient` (364) turns the shape along the tangent, `offset` (365) adds the shape's own
+translation to the point on the path; without it the shape's x/y are ignored. The runtime wraps
+`distance` into 0..1 except that a whole number past 0 lands on the end, so 1 is the end of the path.
+The target may be written after its follower, so the export fills `targetId` in once every shape has
+its index. Keying `distance` animates the shape along the path. Proven with
+`examples/motion_path.rs` (`tests/web/motion-path.riv`) in `@rive-app/canvas` 2.44.0: the dot's
+pixels sit on the path's start (40, 160) at t=0, the middle (150, 100) at t=1 s and the end (260, 40)
+at t=2 s, matching the editor's own preview to within a pixel or two.

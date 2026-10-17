@@ -100,7 +100,7 @@
 </script>
 
 <header>
-  <div class="brand"><img src="/favicon.svg" alt="" width="22" height="22" />Vectro</div>
+  <div class="brand"><img src="{import.meta.env.BASE_URL}favicon.svg" alt="" width="22" height="22" />Vectro</div>
   <div class="group">
     {#each tools as t}
       <button class="tool" class:active={editor.tool === t.tool} onclick={() => (editor.tool = t.tool)} title="{t.label} ({t.key})"><span class="glyph">{t.glyph}</span>{t.label}</button>
