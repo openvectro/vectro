@@ -167,3 +167,11 @@ its index. Keying `distance` animates the shape along the path. Proven with
 `examples/motion_path.rs` (`tests/web/motion-path.riv`) in `@rive-app/canvas` 2.44.0: the dot's
 pixels sit on the path's start (40, 160) at t=0, the middle (150, 100) at t=1 s and the end (260, 40)
 at t=2 s, matching the editor's own preview to within a pixel or two.
+
+## Flutter runtime (2026-10-18)
+
+Checked in the official Flutter runtime: Flutter 3.44.0, `rive` 0.14.11 with `rive_native` 0.1.11,
+headless `flutter test` and a macOS desktop app. All four test files (`button.riv`, `loading-bar.riv`,
+`whack.riv`, `vectro-logo.riv`) load and run with no runtime warnings. Inputs, pointer listeners,
+number-driven blends and events (`clicked`, `hit`) behave as in the web runtime. The `Factory.rive`
+renderer needs a GPU, so headless tests use `Factory.flutter`.
